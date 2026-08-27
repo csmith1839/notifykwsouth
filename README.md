@@ -1,6 +1,8 @@
-# KW Indy Metro South — Office Site
+# Keller Williams Indy Metro Partners — Office Site
 
 Static site for notifykwsouth.com. No build step, no dependencies — plain HTML and CSS.
+Logos live in `assets/` (logo.png for the light header, logo-white.png in reserve for
+dark backgrounds).
 
 ## Deploy to GitHub Pages
 
@@ -25,6 +27,12 @@ the same Cognito account and notifications as before — nothing to reconfigure.
 One optional extra: the old Locations page had a custom Google My Maps embed. The site
 uses a regular Google Maps directions link instead; if you want the custom map back,
 copy its embed code from the Wix editor (or Google My Maps) into office/index.html.
+
+## The lobby TV loop (/tv)
+
+The old site's hidden `notifykwsouth.com/tv` page is a single self-contained HTML file.
+To carry it over, save that file into this folder as `tv/index.html` — it will be live
+at `notifykwsouth.com/tv/` and stays out of the navigation, same as on Wix.
 
 Intentionally NOT on this site (it's public): office door codes, the IGNITE password,
 and personal login credentials. Keep those in the onboarding emails.

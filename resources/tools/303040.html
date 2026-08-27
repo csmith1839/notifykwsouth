@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<meta name="description" content="30/30/40 Calculator — KW Indy Metro South office site">
-<title>30/30/40 Calculator | KW Indy Metro South</title>
+<meta name="description" content="30/30/40 Calculator — KW Indy Metro Partners office site">
+<title>30/30/40 Calculator | KW Indy Metro Partners</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
@@ -16,7 +16,7 @@
 <header>
   <div class="head-in">
     <a class="logo" href="../../index.html">
-      <span class="kw">kw</span><span class="office">Indy Metro South</span>
+      <img src="../../assets/logo.png" alt="Keller Williams Indy Metro Partners" class="logo-img">
     </a>
     <nav><a href="../../index.html">Home</a><a href="../../launch/index.html">Launch Pad</a><a href="../../forms/index.html">Forms</a><a href="../../resources/index.html" class="on">Resources</a><a href="../../training/index.html">Training</a><a href="../../office/index.html">Office</a></nav>
   </div>
@@ -24,34 +24,235 @@
 <main>
   <p class="crumb"><a href="../index.html">← All resources</a></p>
   <p class="eyebrow">Business tool</p>
-  <h1>30 / 30 / 40 Calculator</h1>
-  <p class="lede">Split every commission check with intention: 30% to taxes, 30% back into the business, 40% to you.</p>
-  <div class="calc">
-    <label for="check">Commission check amount</label>
-    <input type="number" id="check" min="0" step="100" placeholder="e.g. 8500" inputmode="decimal">
-    <div class="out">
-      <div class="bucket"><div class="amt" id="o-tax">$0</div><div class="lbl">30% Taxes</div></div>
-      <div class="bucket"><div class="amt" id="o-biz">$0</div><div class="lbl">30% Business</div></div>
-      <div class="bucket hero"><div class="amt" id="o-you">$0</div><div class="lbl">40% You</div></div>
+  <h1>KW MREA 30/30/40 Economic Model</h1>
+  <p class="lede">Explore your path to profit. Green check = your model holds the 40% net income line; the warning state shows exactly how to get back to it.</p>
+  <div class="mrea">
+  <style>
+    .mrea .m-container{max-width:100%;margin:10px 0;padding:16px;background:var(--surface);border-radius:8px;border:1px solid var(--line)}
+    .mrea .m-grid{display:flex;flex-wrap:nowrap;gap:16px;justify-content:space-between}
+    .mrea .m-field{flex:0 0 18%;display:flex;flex-direction:column}
+    .mrea label{font-weight:bold;font-size:14px;margin-bottom:3px}
+    .mrea .input-group{display:flex;align-items:center;gap:4px}
+    .mrea input[type=text]{width:100%;padding:6px;font-size:14px;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+    .mrea input[type=range]{width:100%;margin-top:4px;accent-color:var(--red)}
+    .mrea input:focus{box-shadow:0 0 4px rgba(227,24,55,.4);outline:none}
+    .mrea button{padding:8px 12px;font-size:14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer}
+    .mrea button:hover{background:var(--red-ink)}
+    .mrea .m-results{margin-top:20px;padding:16px;background:var(--paper);border-radius:8px;display:flex;gap:32px}
+    .mrea .m-results p{margin:8px 0;font-size:15px}
+    .mrea .m-results h3{font-family:'Libre Franklin',sans-serif;margin:0 0 6px}
+    .mrea .toggle-group{margin-top:12px;font-size:14px}
+    .mrea .strategy-btn{color:var(--ink);padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;transition:background .2s,border .2s}
+    .mrea .strategy-btn.active{background:var(--red);color:#fff;border-color:var(--red-ink)}
+    @media screen and (max-width:768px){
+      .mrea .m-grid{flex-direction:column}
+      .mrea .m-field{flex:1 1 100%;width:100%}
+      .mrea .m-results{flex-direction:column}
+      .mrea .m-results > div{width:100%}
+      .mrea .strategy-btn{flex:1 1 100%;text-align:center}
+      .mrea .input-group input[type=text]{font-size:16px;flex:1;min-width:0}
+    }
+    @media print{
+      header, footer, nav, .crumb, .m-grid, .m-actions{display:none !important}
+      .mrea .m-results{display:flex}
+    }
+  </style>
+  <div class="m-container">
+    <div class="m-grid">
+      <div class="m-field">
+        <label>Net Income Goal ($)</label>
+        <div class="input-group">
+          <button onclick="adjust('netIncome', -10000)">-</button>
+          <input type="text" id="netIncome" value="$100,000" oninput="formatCurrency(this); syncSlider('netIncome')">
+          <button onclick="adjust('netIncome', 10000)">+</button>
+        </div>
+        <input type="range" id="netIncomeRange" min="0" max="1000000" step="1000" value="100000" oninput="syncInput('netIncome')">
+      </div>
+      <div class="m-field">
+        <label>Cost of Sale ($)</label>
+        <div class="input-group">
+          <button onclick="adjust('costOfSale', -1000)">-</button>
+          <input type="text" id="costOfSale" value="$75,000" oninput="formatCurrency(this); syncSlider('costOfSale')">
+          <button onclick="adjust('costOfSale', 1000)">+</button>
+        </div>
+        <input type="range" id="costOfSaleRange" min="0" max="750000" step="1000" value="75000" oninput="syncInput('costOfSale')">
+      </div>
+      <div class="m-field">
+        <label>Expenses ($)</label>
+        <div class="input-group">
+          <button onclick="adjust('expenses', -1000)">-</button>
+          <input type="text" id="expenses" value="$75,000" oninput="formatCurrency(this); syncSlider('expenses')">
+          <button onclick="adjust('expenses', 1000)">+</button>
+        </div>
+        <input type="range" id="expensesRange" min="0" max="750000" step="1000" value="75000" oninput="syncInput('expenses')">
+      </div>
+      <div class="m-field">
+        <label>Commission per Unit ($)</label>
+        <div class="input-group">
+          <button onclick="adjust('commission', -100)">-</button>
+          <input type="text" id="commission" value="" oninput="formatCurrency(this); syncSlider('commission')">
+          <button onclick="adjust('commission', 100)">+</button>
+        </div>
+        <input type="range" id="commissionRange" min="1000" max="25000" step="100" value="5000" oninput="syncInput('commission')">
+      </div>
+      <div class="m-field">
+        <label>Database Conversion (%)</label>
+        <div class="input-group">
+          <button onclick="adjust('dbConversion', -1)">-</button>
+          <input type="text" id="dbConversion" value="10%" oninput="formatPercent(this); syncSlider('dbConversion')">
+          <button onclick="adjust('dbConversion', 1)">+</button>
+        </div>
+        <input type="range" id="dbConversionRange" min="1" max="100" step="1" value="10" oninput="syncInput('dbConversion')">
+      </div>
     </div>
-    <p class="note">Set the tax slice aside the day the check lands — future-you at tax time says thanks. This is a planning tool, not tax advice; your CPA has the final word on your actual rate.</p>
+    <div class="m-results" id="results"></div>
+  </div>
+  <div class="m-actions" style="text-align:center;margin-top:16px">
+    <button onclick="resetFields()" style="margin-right:10px">Reset</button>
+    <button onclick="window.print()" style="background:var(--ink)">Print</button>
+  </div>
+  <p style="font-size:12px;color:var(--muted);margin-top:20px"><strong>Disclaimer:</strong> The information and figures provided by this calculator are for illustrative and educational purposes only. Results are based solely on the user's input and are not guarantees of future performance or income. Actual results may vary due to market conditions, personal efforts, skill, and other factors beyond our control. This calculator does not constitute financial, tax, business, or legal advice. Users should consult with qualified professionals before making business decisions.</p>
   </div>
   <script>
-    const inp = document.getElementById('check');
-    const fmt = n => '$' + n.toLocaleString('en-US', {maximumFractionDigits: 0});
-    inp.addEventListener('input', () => {
-      const v = Math.max(0, parseFloat(inp.value) || 0);
-      document.getElementById('o-tax').textContent = fmt(v * .3);
-      document.getElementById('o-biz').textContent = fmt(v * .3);
-      document.getElementById('o-you').textContent = fmt(v * .4);
-    });
+let selectedStrategy = 'units';
+function parseCurrency(value) { return parseFloat(value.replace(/[^\d]/g, '')) || 0; }
+function parsePercent(value) { return parseFloat(value.replace(/[^\d]/g, '')) || 0; }
+function formatCurrency(el) { const val = parseCurrency(el.value); el.value = val ? '$' + val.toLocaleString() : ''; }
+function formatPercent(el) { const val = parsePercent(el.value); el.value = val + '%'; }
+function syncInput(id) {
+  const val = parseFloat(document.getElementById(id + 'Range').value);
+  document.getElementById(id).value = id === 'dbConversion' ? val + '%' : '$' + val.toLocaleString();
+  calculate();
+}
+function syncSlider(id) {
+  const val = id === 'dbConversion' ? parsePercent(document.getElementById(id).value) : parseCurrency(document.getElementById(id).value);
+  document.getElementById(id + 'Range').value = val;
+  calculate();
+}
+function adjust(id, delta) {
+  let current = id === 'dbConversion' ? parsePercent(document.getElementById(id).value) : parseCurrency(document.getElementById(id).value);
+  const newVal = Math.max(0, current + delta);
+  document.getElementById(id).value = id === 'dbConversion' ? newVal + '%' : '$' + newVal.toLocaleString();
+  document.getElementById(id + 'Range').value = newVal;
+  calculate();
+}
+function resetFields() {
+  document.getElementById('netIncome').value = "$100,000";
+  document.getElementById('costOfSale').value = "$75,000";
+  document.getElementById('expenses').value = "$75,000";
+  document.getElementById('commission').value = "";
+  document.getElementById('dbConversion').value = "10%";
+  document.getElementById('netIncomeRange').value = 100000;
+  document.getElementById('costOfSaleRange').value = 75000;
+  document.getElementById('expensesRange').value = 75000;
+  document.getElementById('commissionRange').value = 5000;
+  document.getElementById('dbConversionRange').value = 10;
+  selectedStrategy = 'units';
+  updateStrategyButtons();
+  calculate();
+}
+function selectStrategy(strategy) { selectedStrategy = strategy; updateStrategyButtons(); calculate(); }
+function updateStrategyButtons() {
+  document.querySelectorAll('.strategy-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.strategy === selectedStrategy);
+  });
+}
+function calculate() {
+  const net = parseCurrency(document.getElementById('netIncome').value);
+  const cos = parseCurrency(document.getElementById('costOfSale').value);
+  const exp = parseCurrency(document.getElementById('expenses').value);
+  const comm = parseCurrency(document.getElementById('commission').value) || 1;
+  const conv = parsePercent(document.getElementById('dbConversion').value) / 100;
+  const gci = net + cos + exp;
+  const cosPct = (cos / gci) * 100;
+  const expPct = (exp / gci) * 100;
+  const profitPct = (net / gci) * 100;
+  const units = Math.ceil(gci / comm);
+  const dbSize = Math.ceil(units / conv);
+  let strategyHTML = '';
+  let adjustedHTML = '';
+  if (profitPct < 40) {
+    const adjustedGCI = (cos + exp) / 0.6;
+    const extraGCI = adjustedGCI - gci;
+    const halfGCI = gci + (extraGCI / 2);
+    strategyHTML = `
+      <div class="toggle-group">
+        <p><strong>How to Reach 40% Net Income:</strong></p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="strategy-btn" data-strategy="units" onclick="selectStrategy('units')">📈 More Units</button>
+          <button class="strategy-btn" data-strategy="costs" onclick="selectStrategy('costs')">💰 Lower Costs</button>
+          <button class="strategy-btn" data-strategy="combo" onclick="selectStrategy('combo')">⚖ Combo</button>
+        </div>
+      </div>`;
+    let aGCI = adjustedGCI, aCOS = cos, aEXP = exp;
+    if (selectedStrategy === 'costs') {
+      aGCI = gci;
+      const allowed = gci * 0.6;
+      const ratio = allowed / (cos + exp);
+      aCOS = cos * ratio;
+      aEXP = exp * ratio;
+    } else if (selectedStrategy === 'combo') {
+      aGCI = halfGCI;
+      const allowed = aGCI * 0.6;
+      const ratio = allowed / (cos + exp);
+      aCOS = cos * ratio;
+      aEXP = exp * ratio;
+    }
+    const aNet = aGCI - aCOS - aEXP;
+    const aCosPct = (aCOS / aGCI) * 100;
+    const aExpPct = (aEXP / aGCI) * 100;
+    const aProfitPct = (aNet / aGCI) * 100;
+    const aUnits = Math.ceil(aGCI / comm);
+    const aDB = Math.ceil(aUnits / conv);
+    let changeNote = '';
+    if (selectedStrategy === 'units') {
+      const gciDiff = aGCI - gci;
+      const unitDiff = Math.ceil(gciDiff / comm);
+      changeNote = `<div style="margin-top: 10px;"><em>+${unitDiff.toLocaleString()} units needed to add $${Math.round(gciDiff).toLocaleString()} in GCI</em></div>`;
+    } else if (selectedStrategy === 'costs') {
+      const drop = (cos + exp) - (aCOS + aEXP);
+      changeNote = `<div style="margin-top: 10px;"><em>Reduce costs by $${Math.round(drop).toLocaleString()}</em></div>`;
+    } else {
+      const gciDiff = aGCI - gci;
+      const unitDiff = Math.ceil(gciDiff / comm);
+      const drop = (cos + exp) - (aCOS + aEXP);
+      changeNote = `<div style="margin-top: 10px;"><em>Add ${unitDiff.toLocaleString()} units and reduce costs by $${Math.round(drop).toLocaleString()}</em></div>`;
+    }
+    strategyHTML += changeNote;
+    adjustedHTML = `
+      <h3>Adjusted Model</h3>
+      <p><strong>Total GCI:</strong> $${Math.round(aGCI).toLocaleString()}</p>
+      <p><strong>Cost of Sale:</strong> $${Math.round(aCOS).toLocaleString()} (${aCosPct.toFixed(1)}%)</p>
+      <p><strong>Expenses:</strong> $${Math.round(aEXP).toLocaleString()} (${aExpPct.toFixed(1)}%)</p>
+      <p><strong>Net Income:</strong> $${Math.round(aNet).toLocaleString()} (${aProfitPct.toFixed(1)}%)</p>
+      <p><strong>Commission Per Unit:</strong> $${comm.toLocaleString()}</p>
+      <p><strong>Units Needed:</strong> ${aUnits.toLocaleString()}</p>
+      <p><strong>Database Size:</strong> ${aDB.toLocaleString()}</p>`;
+  }
+  document.getElementById('results').innerHTML = `
+    <div style="flex: 1;">
+      <h3>Current Metrics ${profitPct >= 40 ? '✅' : '⚠'}</h3>
+      <p><strong>Total GCI:</strong> $${gci.toLocaleString()}</p>
+      <p><strong>Cost of Sale:</strong> $${cos.toLocaleString()} (${cosPct.toFixed(1)}%)</p>
+      <p><strong>Expenses:</strong> $${exp.toLocaleString()} (${expPct.toFixed(1)}%)</p>
+      <p><strong>Net Income:</strong> $${net.toLocaleString()} (${profitPct.toFixed(1)}%)</p>
+      <p><strong>Commission Per Unit:</strong> $${comm.toLocaleString()}</p>
+      <p><strong>Units Needed:</strong> ${units.toLocaleString()}</p>
+      <p><strong>Database Size:</strong> ${dbSize.toLocaleString()}</p>
+      ${strategyHTML}
+    </div>
+    <div style="flex: 1;">${adjustedHTML}</div>
+  `;
+  updateStrategyButtons();
+}
+window.onload = calculate;
   </script>
 
 </main>
 <footer>
   <div class="foot-in">
     <div>
-      <b>KW Indy Metro South</b> · Keller Williams Realty<br>
+      <b>KW Indy Metro Partners</b> · Keller Williams Realty<br>
       48 N Emerson Ave, Suite 300, Greenwood, IN 46143 · <a href="tel:3178825900">(317) 882-5900</a>
     </div>
     <div class="foot-hot">Broker Hotline: <a href="tel:3176611607">317-661-1607</a></div>

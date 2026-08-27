@@ -1,4 +1,4 @@
-/* KW Indy Metro South — site styles */
+/* KW Indy Metro Partners — site styles */
 :root{
   --red:#B40111; --red-ink:#8E020F; --red-soft:#F6ECEC;
   --ink:#17161A; --paper:#F7F5F4; --surface:#FFFFFF;
@@ -9,9 +9,8 @@ body{margin:0;background:var(--paper);color:var(--ink);
   font-family:'Source Sans 3','Segoe UI',system-ui,sans-serif;font-size:1.02rem;line-height:1.55}
 header{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
 .head-in{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.logo{display:flex;align-items:baseline;gap:9px;padding:14px 0;text-decoration:none;color:var(--ink)}
-.logo .kw{font-family:'Libre Franklin',sans-serif;font-weight:900;font-size:1.5rem;letter-spacing:-.04em;color:var(--red);line-height:1}
-.logo .office{font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.1em}
+.logo{display:flex;align-items:center;padding:10px 0;text-decoration:none}
+.logo-img{height:52px;width:auto;display:block}
 nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
 nav a{font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:.9rem;color:var(--muted);
   padding:20px 14px 17px;border-bottom:3px solid transparent;text-decoration:none}

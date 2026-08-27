@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<meta name="description" content="Economic Model — KW Indy Metro South office site">
-<title>Economic Model | KW Indy Metro South</title>
+<meta name="description" content="Economic Model — KW Indy Metro Partners office site">
+<title>Economic Model | KW Indy Metro Partners</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
@@ -16,7 +16,7 @@
 <header>
   <div class="head-in">
     <a class="logo" href="../../index.html">
-      <span class="kw">kw</span><span class="office">Indy Metro South</span>
+      <img src="../../assets/logo.png" alt="Keller Williams Indy Metro Partners" class="logo-img">
     </a>
     <nav><a href="../../index.html">Home</a><a href="../../launch/index.html">Launch Pad</a><a href="../../forms/index.html">Forms</a><a href="../../resources/index.html" class="on">Resources</a><a href="../../training/index.html">Training</a><a href="../../office/index.html">Office</a></nav>
   </div>
@@ -24,45 +24,135 @@
 <main>
   <p class="crumb"><a href="../index.html">← All resources</a></p>
   <p class="eyebrow">Business tool</p>
-  <h1>Economic Model</h1>
-  <p class="lede">The KW economic model runs backwards: start from the income you want, end at the appointments it takes to earn it.</p>
-  <div class="calc">
-    <label for="gci">Annual GCI goal ($)</label>
-    <input type="number" id="gci" value="120000" min="0" step="5000" inputmode="decimal">
-    <label for="price">Average sale price in your market ($)</label>
-    <input type="number" id="price" value="300000" min="0" step="10000" inputmode="decimal">
-    <label for="rate">Average commission per side (%)</label>
-    <input type="number" id="rate" value="2.75" min="0" max="10" step="0.05" inputmode="decimal">
-    <label for="conv">Appointments that become closings (%)</label>
-    <input type="number" id="conv" value="50" min="1" max="100" step="5" inputmode="decimal">
-    <div class="out">
-      <div class="bucket"><div class="amt" id="e-close">—</div><div class="lbl">Closings / yr</div></div>
-      <div class="bucket"><div class="amt" id="e-appt">—</div><div class="lbl">Appointments / yr</div></div>
-      <div class="bucket hero"><div class="amt" id="e-week">—</div><div class="lbl">Appointments / wk</div></div>
+  <h1>MREA Economic Model</h1>
+  <p class="lede">The 30/30/40 model, run backwards: from the income you want to the contacts and appointments it takes each week to earn it.</p>
+  <div class="mrea">
+  <style>
+    .mrea .m-container{display:flex;flex-wrap:wrap;gap:24px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:25px;margin:15px 0}
+    .mrea .m-column{flex:1;min-width:260px}
+    .mrea label{font-weight:bold;display:block;margin-top:15px}
+    .mrea label:first-child{margin-top:0}
+    .mrea input, .mrea select{width:100%;padding:10px;margin-top:5px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-size:15px}
+    .mrea input:focus, .mrea select:focus{box-shadow:0 0 5px rgba(227,24,55,.5);outline:none}
+    .mrea .m-results{background:var(--paper);padding:20px;border-radius:8px;font-size:15px}
+    .mrea .m-results h3{font-family:'Libre Franklin',sans-serif;font-size:18px;margin:0 0 8px}
+    .mrea .m-results p{font-size:15px;margin:8px 0}
+    .mrea .m-results small{font-size:13px;color:var(--muted)}
+    .mrea .btn{background:var(--red);color:#fff;border:none;padding:10px 20px;margin-top:20px;border-radius:8px;cursor:pointer;width:100%;font-size:16px}
+    .mrea .btn:hover{background:var(--red-ink)}
+    .mrea .print-btn{background:var(--ink)}
+    @media print{
+      header, footer, nav, .crumb, .m-inputs, .btn{display:none !important}
+    }
+  </style>
+  <div class="m-container">
+    <div class="m-column m-inputs">
+      <label>Desired Net Income ($):</label>
+      <input type="text" id="netIncome" value="$100,000" onblur="formatCurrencyField(this)" oninput="calculateMREA()">
+      <label>Commission per Transaction ($):</label>
+      <input type="text" id="commissionPerTransaction" placeholder="$" onblur="formatCurrencyField(this)" oninput="calculateMREA()">
+      <label>Contact to Appt Conversion %:</label>
+      <input type="text" id="contactToAppointment" placeholder="1%" value="1%" onblur="formatPercentField(this)" oninput="calculateMREA()">
+      <label>Appt to Agreement Conversion %:</label>
+      <input type="text" id="appointmentToAgreement" placeholder="70%" value="70%" onblur="formatPercentField(this)" oninput="calculateMREA()">
+      <label>Agreement to Closing Conversion %:</label>
+      <input type="text" id="agreementToClosing" placeholder="70%" value="70%" onblur="formatPercentField(this)" oninput="calculateMREA()">
+      <label>Database Conversion to Closed Units %:</label>
+      <select id="databaseConversion" onchange="calculateMREA()">
+        <option value="0.05">5% - Launching/Poor Return</option>
+        <option value="0.1" selected>10% - Good Return</option>
+        <option value="0.15">15% - Great Return</option>
+      </select>
+      <button class="btn print-btn" onclick="window.print()" style="display:none;" id="printBtn">Print Results</button>
+      <button class="btn" onclick="resetFields()">Reset Fields</button>
     </div>
-    <p class="note">That weekly number is the one to put on your wall — everything upstream of it (contacts, conversations, lead gen hours) exists to produce it. Talk to your Productivity Coach about the contacts-per-appointment ratio for your lead sources.</p>
+    <div class="m-column">
+      <div id="results" class="m-results" style="display:none;"></div>
+    </div>
+  </div>
   </div>
   <script>
-    const ids = ['gci','price','rate','conv'];
-    function calc(){
-      const [gci, price, rate, conv] = ids.map(i => Math.max(0, parseFloat(document.getElementById(i).value) || 0));
-      if (!gci || !price || !rate || !conv) return;
-      const perDeal = price * rate / 100;
-      const closings = gci / perDeal;
-      const appts = closings / (conv / 100);
-      document.getElementById('e-close').textContent = Math.ceil(closings);
-      document.getElementById('e-appt').textContent = Math.ceil(appts);
-      document.getElementById('e-week').textContent = (appts / 50).toFixed(1);
+    function formatCurrencyField(input) {
+      let value = parseFloat(input.value.replace(/[^0-9]/g, ''));
+      if (!isNaN(value)) {
+        input.value = '$' + value.toLocaleString('en-US', { maximumFractionDigits: 0 });
+      } else {
+        input.value = '';
+      }
     }
-    ids.forEach(i => document.getElementById(i).addEventListener('input', calc));
-    calc();
+    function formatPercentField(input) {
+      let value = parseFloat(input.value.replace(/[^0-9]/g, ''));
+      if (!isNaN(value)) {
+        input.value = value + '%';
+      } else {
+        input.value = '';
+      }
+    }
+    function parseCurrency(input) {
+      return parseFloat(input.replace(/[^0-9]/g, '')) || 0;
+    }
+    function parsePercent(input) {
+      return parseFloat(input.replace(/[^0-9]/g, '')) / 100 || 0;
+    }
+    function calculateMREA() {
+      var netIncome = parseCurrency(document.getElementById('netIncome').value);
+      var commissionPerTransaction = parseCurrency(document.getElementById('commissionPerTransaction').value);
+      var contactToAppointment = parsePercent(document.getElementById('contactToAppointment').value);
+      var appointmentToAgreement = parsePercent(document.getElementById('appointmentToAgreement').value);
+      var agreementToClosing = parsePercent(document.getElementById('agreementToClosing').value);
+      var databaseConversion = parseFloat(document.getElementById('databaseConversion').value);
+      if (netIncome <= 0 || commissionPerTransaction <= 0 || contactToAppointment <= 0 || appointmentToAgreement <= 0 || agreementToClosing <= 0) {
+        document.getElementById('results').innerHTML = "<p style='color:var(--red);'>Please fill in all fields correctly.</p>";
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('printBtn').style.display = 'none';
+        return;
+      }
+      var gci = netIncome / 0.4;
+      var transactionsNeeded = Math.ceil(gci / commissionPerTransaction);
+      var agreementsNeeded = Math.ceil(transactionsNeeded / agreementToClosing);
+      var appointmentsNeeded = Math.ceil(agreementsNeeded / appointmentToAgreement);
+      var contactsNeeded = Math.ceil(appointmentsNeeded / contactToAppointment);
+      var appointmentsPerWeek = Math.ceil(appointmentsNeeded / 50);
+      var contactsPerWeek = Math.ceil(contactsNeeded / 50);
+      var databaseSizeNeeded = Math.ceil(transactionsNeeded / databaseConversion);
+      document.getElementById('results').innerHTML = `
+        <h3>Your Economic Model:</h3>
+        <p><strong>Gross Commission Income (GCI) Needed:</strong> $${gci.toLocaleString('en-US', { maximumFractionDigits: 0 })}</p>
+        <p><strong>Transactions Needed:</strong> ${transactionsNeeded}</p>
+        <p><strong>Agreements Needed:</strong> ${agreementsNeeded}</p>
+        <p><strong>Appointments Needed:</strong> ${appointmentsNeeded}</p>
+        <p><strong>Contacts Needed:</strong> ${contactsNeeded}</p>
+        <p><strong>Appointments Needed per Week:</strong> ${appointmentsPerWeek}</p>
+        <p><strong>Contacts Needed per Week:</strong> ${contactsPerWeek}</p>
+        <hr>
+        <h3>Database Size Calculator:</h3>
+        <p><strong>Database Size Needed:</strong> ${databaseSizeNeeded} contacts</p>
+        <small>Based on selected conversion rate from engaged database to closing (${(databaseConversion * 100).toFixed(0)}%).</small>
+        <hr>
+        <small style="display:block; margin-top:20px;">
+          Disclaimer: The information and figures provided by this calculator are for illustrative and educational purposes only. Results are based solely on the user's input and are not guarantees of future performance or income. Actual results may vary due to market conditions, personal efforts, skill, and other factors beyond our control. This calculator does not constitute financial, tax, business, or legal advice. Users should consult with qualified professionals before making business decisions.
+        </small>
+      `;
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('printBtn').style.display = 'block';
+    }
+    function resetFields() {
+      document.getElementById('netIncome').value = '$100,000';
+      document.getElementById('commissionPerTransaction').value = '';
+      document.getElementById('contactToAppointment').value = '1%';
+      document.getElementById('appointmentToAgreement').value = '70%';
+      document.getElementById('agreementToClosing').value = '70%';
+      document.getElementById('databaseConversion').value = '0.1';
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('printBtn').style.display = 'none';
+    }
   </script>
 
 </main>
 <footer>
   <div class="foot-in">
     <div>
-      <b>KW Indy Metro South</b> · Keller Williams Realty<br>
+      <b>KW Indy Metro Partners</b> · Keller Williams Realty<br>
       48 N Emerson Ave, Suite 300, Greenwood, IN 46143 · <a href="tel:3178825900">(317) 882-5900</a>
     </div>
     <div class="foot-hot">Broker Hotline: <a href="tel:3176611607">317-661-1607</a></div>
