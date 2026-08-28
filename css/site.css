@@ -147,6 +147,21 @@ a.card:hover h3{color:var(--red)}
   font-size:.88rem;flex:none}
 .who .nm{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:.95rem;line-height:1.25}
 .who .rl{font-size:.8rem;color:var(--muted)}
+/* ---- simple/advanced segmented toggle ---- */
+.seg{display:inline-flex;border:1.5px solid var(--red);border-radius:99px;overflow:hidden;
+  margin:2px 0 14px;background:var(--surface)}
+.seg a{padding:8px 22px;font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:.9rem;
+  text-decoration:none;color:var(--red)}
+.seg a.on{background:var(--red);color:#fff}
+.seg a:hover:not(.on){background:var(--red-soft)}
+/* ---- launch pad path ---- */
+.stepnum{width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;
+  display:grid;place-items:center;font-family:'Libre Franklin',sans-serif;font-weight:900;
+  font-size:1.15rem;margin-bottom:2px}
+.path{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.path .card{padding:18px}
+.path h3{font-size:1.06rem}
+.face-sm{width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:top;display:block}
 /* ---- interior page head band ---- */
 .page-head{background:linear-gradient(115deg,var(--sand),#F7F2EA 55%,var(--sand));
   border-bottom:1px solid var(--sand-line);margin-top:-36px;margin-bottom:30px;
