@@ -73,6 +73,8 @@ a.card:hover h3{color:var(--red)}
 .callout b{font-family:'Libre Franklin',sans-serif}
 .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .person{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.person .face{width:100%;aspect-ratio:1/1.05;object-fit:cover;object-position:top;
+  border-radius:10px;margin:0 0 12px;background:var(--sand);display:block}
 .person .name{font-family:'Libre Franklin',sans-serif;font-weight:800;margin:0}
 .person .role{color:var(--red);font-size:.78rem;font-weight:700;text-transform:uppercase;
   letter-spacing:.09em;margin:2px 0 8px;font-family:'Libre Franklin',sans-serif}
@@ -145,6 +147,25 @@ a.card:hover h3{color:var(--red)}
   font-size:.88rem;flex:none}
 .who .nm{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:.95rem;line-height:1.25}
 .who .rl{font-size:.8rem;color:var(--muted)}
+/* ---- interior page head band ---- */
+.page-head{background:linear-gradient(115deg,var(--sand),#F7F2EA 55%,var(--sand));
+  border-bottom:1px solid var(--sand-line);margin-top:-36px;margin-bottom:30px;
+  padding:30px 20px 28px;position:relative;overflow:hidden}
+.page-head::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 58%,rgba(180,1,17,.04) 58% 74%,transparent 74%)}
+.ph-in{max-width:1080px;margin:0 auto;position:relative;z-index:1}
+.page-head .lede{margin-bottom:0}
+.page-head .crumb{margin-bottom:14px}
+/* ---- "where to next" strip ---- */
+.next{margin-top:44px;background:var(--sand);border:1px solid var(--sand-line);
+  border-radius:14px;padding:18px 22px 16px}
+.next .nx-label{font-family:'Libre Franklin',sans-serif;font-weight:800;text-transform:uppercase;
+  letter-spacing:.13em;font-size:.68rem;color:var(--red);margin:0 0 8px}
+.next a{display:inline-flex;gap:8px;align-items:baseline;margin:4px 22px 4px 0;
+  font-weight:700;color:var(--ink);text-decoration:none;font-size:.97rem}
+.next a::before{content:"→";color:var(--red);font-weight:800}
+.next a:hover{color:var(--red)}
+.next .why{color:var(--muted);font-weight:400}
 /* ---- footer ---- */
 footer{background:var(--ink);color:#CBC5C9;border-top:4px solid var(--red);margin-top:30px}
 .foot-in{max-width:1080px;margin:0 auto;padding:38px 20px 30px;display:grid;
