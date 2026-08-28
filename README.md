@@ -34,7 +34,7 @@ The old site's hidden `notifykwsouth.com/tv` page is a single self-contained HTM
 To carry it over, save that file into this folder as `tv/index.html` — it will be live
 at `notifykwsouth.com/tv/` and stays out of the navigation, same as on Wix.
 
-Intentionally NOT on this site (it's public): office door codes, the IGNITE password,
+Intentionally NOT on this site (it's public): office door codes, course passwords,
 and personal login credentials. Keep those in the onboarding emails.
 
 ## Editing content
