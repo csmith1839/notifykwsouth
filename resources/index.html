@@ -107,7 +107,7 @@
   <section class="lib">
   <h2>MLS &amp; boards</h2>
   <div class="grid">
-    <a class="card" data-tags="mibor blc mls listing central supra lockbox showings public records crs matrix forewarn safety verify identity" href="mibor.html">
+    <a class="card" data-tags="mibor blc mls listing central supra lockbox showings public records crs matrix forewarn safety verify identity hotsheet comps cma auto email portal buyer search domus stats cubicasa floor plan gitcha connectblc" href="mibor.html">
       <h3>How to use MIBOR &amp; the BLC</h3>
       <p>Where to log in, what connectBLC does, FOREWARN safety verification, and the rest of the tools your dues already pay for.</p>
       <p class="meta">Office SOP →</p>
@@ -116,6 +116,11 @@
       <h3>FOREWARN — verify before you meet</h3>
       <p>Free with MIBOR: identity, criminal history, and ownership checks from just a phone number, before every first meeting.</p>
       <p class="meta">Office SOP · Safety →</p>
+    </a>
+    <a class="card" data-tags="ce continuing education renewal license ipla post licensing 30 hour recp free hours ethics expire" href="license-ce.html">
+      <h3>License renewal &amp; CE</h3>
+      <p>The Indiana rules in one place — 12 hours a year, the 30-hour new-broker course, the 3-year renewal — and the free CE your dues already cover.</p>
+      <p class="meta">Office SOP →</p>
     </a>
     <a class="card" data-tags="join board license mibor thaar irmls bloomington terre haute membership" href="../launch/licensing-mls.html">
       <h3>Joining a board — MIBOR, THAAR, or Bloomington</h3>
@@ -167,7 +172,12 @@
       var shown = 0;
       cards.forEach(function(c){
         var hay = (c.textContent + ' ' + (c.getAttribute('data-tags')||'')).toLowerCase();
-        var hit = !v || hay.indexOf(v) > -1;
+        var hit;
+        if (!v) { hit = true; }
+        else if (v.length <= 3) {
+          // short queries match word starts only, so "ce" doesn't match "office"
+          hit = (' ' + hay.replace(/[^a-z0-9]+/g, ' ')).indexOf(' ' + v) > -1;
+        } else { hit = hay.indexOf(v) > -1; }
         c.style.display = hit ? '' : 'none';
         if (hit) shown++;
       });
