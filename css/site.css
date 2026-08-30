@@ -8,6 +8,8 @@
   --shadow-lift:0 2px 4px rgba(23,22,26,.06),0 16px 34px -18px rgba(23,22,26,.32);
 }
 *{box-sizing:border-box}
+html{overflow-x:hidden}
+.mrea{overflow-x:auto} /* wide calculator grids scroll inside their own box, never the page */
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:'Source Sans 3','Segoe UI',system-ui,sans-serif;font-size:1.02rem;line-height:1.55}
 header{position:sticky;top:0;z-index:10;background:var(--surface);border-top:4px solid var(--red);
