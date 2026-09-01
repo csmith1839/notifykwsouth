@@ -186,17 +186,30 @@ a.card:hover h3{color:var(--red)}
 .path{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .path .card{padding:18px}
 .path h3{font-size:1.06rem}
-.pre .card{padding:15px 16px;gap:6px}
-.pre h3{font-size:1rem}
-.pre .card p{font-size:.88rem}
-.pre .stepnum{width:32px;height:32px;font-size:.95rem}
-.path-label{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:1rem;
-  margin:26px 0 12px;letter-spacing:-.01em}
-.path-label b{color:var(--red)}
-.path-main{display:grid;gap:14px;grid-template-columns:1fr}
+.sprint{margin-top:-58px;position:relative;z-index:2;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 22px 12px}
+.sprint .sp-head{display:flex;justify-content:space-between;gap:8px 18px;flex-wrap:wrap;
+  align-items:baseline;margin-bottom:6px}
+.sprint .sp-title{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.13em;color:var(--red)}
+.sprint .sp-note{font-size:.86rem;color:var(--muted)}
+.sprint .sp-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 26px}
+.sprint a.sp{display:flex;gap:10px;align-items:baseline;text-decoration:none;color:var(--ink);
+  font-weight:700;font-size:.95rem;padding:9px 0;border-top:1px dashed var(--line)}
+.sprint a.sp:hover{color:var(--red)}
+.sprint a.sp .n{width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;
+  display:grid;place-items:center;font-family:'Libre Franklin',sans-serif;font-weight:800;
+  font-size:.75rem;flex:none;align-self:center}
+.sprint a.sp small{color:var(--muted);font-weight:400;font-size:.82rem}
+.path-main{display:grid;gap:14px;grid-template-columns:1fr;margin-top:16px}
 @media (min-width:720px){.path-main{grid-template-columns:1.45fr 1fr}}
 .card.feature{border:2px solid var(--red);box-shadow:var(--shadow-lift)}
 .card.feature h3{font-size:1.3rem}
+.pace{display:grid;gap:22px;grid-template-columns:1fr;align-items:center}
+@media (min-width:760px){.pace{grid-template-columns:1.7fr auto}}
+.face-lg{width:112px;height:112px;border-radius:50%;object-fit:cover;object-position:top;
+  box-shadow:var(--shadow);display:inline-block}
+img.av{object-fit:cover;object-position:top}
 .face-sm{width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:top;display:block}
 /* ---- interior page head band ---- */
 .page-head{background:linear-gradient(115deg,var(--sand),#F7F2EA 55%,var(--sand));
