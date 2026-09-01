@@ -31,7 +31,7 @@ body.idle{cursor:none}
   <div class="meta"><b id="hudTitle">—</b><span id="hudIdx">— / —</span></div>
 </div>
 <script>/* qrcode-generator inlined (MIT, Kazuhiko Arase) */
-/* qrcode-generator inlined (MIT, Kazuhiko Arase) */
+
 //---------------------------------------------------------------------
 //
 // QR Code Generator for JavaScript
@@ -2362,6 +2362,7 @@ const TEMPLATES = [
   {key:'win',        name:'Team Win',    desc:'Closings, contracts & milestones'},
   {key:'event',      name:'Local Event', desc:'Office promos & save-the-dates'},
   {key:'kwevent',    name:'KW Events',   desc:'BOLD · Mega Camp · Family Reunion'},
+  {key:'bold',       name:'BOLD Promo',  desc:'Onward BOLD sequences · 3 variants', defaultTheme:'boldpurple'},
   {key:'podcast',    name:'Podcast',     desc:'Big Real Estate Energy'},
   {key:'stat',       name:'Big Number',  desc:'Stats that stop the scroll'},
   {key:'quote',      name:'Quote',       desc:'Mission & testimonials'},
@@ -2403,9 +2404,13 @@ const STAT_PRESETS = [
  {stat:'$799', label:'for 6 weeks of BOLD. One closing pays for it *many* times over.', source:'Onward BOLD · Sept 30 – Nov 4'},
  {stat:'5',    label:'free hours. First Step to BOLD — no strings.', source:'Wed, Sept 30 · 9 AM–2 PM · Greenwood'},
 ];
+const BOLD_FULL_VARIANTS = ['Round two (grads)','Sign up now']; // these angles register for the paid program
+const BOLD_QR_FREE = 'https://na.eventscloud.com/website/97870/';
+const BOLD_QR_FULL = 'https://na.eventscloud.com/website/97871/';
 const QR_URLS = {
   recruiting:'https://heykw.com', spotlight:'https://heykw.com', event:'https://heykw.com',
   story:'https://heykw.com', win:'https://heykw.com', kwevent:'https://events.kw.com',
+  bold:'https://na.eventscloud.com/website/97870/',
   podcast:'https://heykw.com', stat:'https://heykw.com', quote:'https://heykw.com',
   values:'https://heykw.com', leverage:'https://myleveragesolutions.com', coaching:'https://doubledutybydesign.com',
 };
@@ -2418,6 +2423,7 @@ const QUOTE_PRESETS = [
  {quote:'Together everyone achieves more.', attr:'WI4C2TES', role:'The KW Belief System'},
  {quote:'Change your focus, change your life.', attr:'A BOLD Law', role:'KW MAPS · BOLD'},
  {quote:'A changing market requires a change in approach.', attr:'Onward BOLD', role:'Rewritten by Gary Keller · starts Sept 30'},
+ {quote:'Fail to plan = plan to fail.', attr:'A BOLD Law', role:'Onward BOLD · KW MAPS'},
  {quote:'Come from contribution.', attr:'A BOLD Law', role:'KW MAPS · BOLD'},
  {quote:'The Easy Button for your business.', attr:'My Leverage Solutions', role:'myleveragesolutions.com'},
  {quote:'Build by design, not by default.', attr:'Double Duty by Design', role:'Coaching with Carla · doubledutybydesign.com'},
@@ -2450,6 +2456,14 @@ const BANKS = {
   kicker:["THE BIG STAGE","GO WHERE GROWTH IS","ROAD TRIP","ALL IN","INDY ROLLS DEEP"],
   headline:[], tagline:[], dateline:[], sub:[],
   cta:["Roll with us → heykw.com","Ask us about tickets → heykw.com","Save your seat → events.kw.com"]},
+ bold:{
+  variant:["Afford it?","Do the math","Free first step","No time?","Round two (grads)","Sign up now","Meet your coach","The schedule","What we accomplish","Life by design","The MLS test","10,000 agents"],
+  coach:["Scott Toombs"],
+  dateline:["WED · SEPT 30 · FREE FIRST STEP","FREE FIRST STEP · SEPT 30 · 9 AM"],
+  where:["48 N. Emerson Ave, Greenwood"],
+  invest:["$799 · avg return 10 deals","$799 · one closing covers it"],
+  sched:["FREE FIRST STEP|SEPT 30|9:00–2:00\nSTEP TWO|OCT 7|9:00–2:30\nSTEP THREE|OCT 14|9:00–2:30\nSTEP FOUR|OCT 21|9:00–2:30\nSTEP FIVE|OCT 28|9:00–2:30\nSTEP SIX|NOV 4|9:00–2:30"],
+  cta:["Scan to register free","Save your free seat","Start free → Sept 30"]},
  podcast:{
   epnum:["EP. 001","EP. 012","EP. 024","NEW"],
   headline:["From 12 to 60 deals: what actually changed","The listing playbook for this market","Your database is your net worth","Building a team without losing your life","What new agents get wrong (and how to fix it)","Lead gen that doesn't feel gross","The cap, explained in 10 minutes","Profit share, demystified","From solo to team: the honest math","Winning listings in a shifting market","The hero's journey of a mega agent","Double duty: real estate around a day job","Systems that survive a hot market","Your first 100 days at a new brokerage","What we'd tell our rookie selves"],
@@ -2484,6 +2498,7 @@ const FIELDS = {
  win:[{k:'kicker',l:'Kicker'},{k:'headline',l:'The win · *word* turns red'},{k:'sub',l:'Shoutout / details',area:1},{k:'cta',l:'Call to action'}],
  event:[{k:'kicker',l:'Kicker'},{k:'headline',l:'Event name'},{k:'dateline',l:'Date & time'},{k:'sub',l:'Location / details',area:1},{k:'cta',l:'Call to action'}],
  kwevent:[{k:'kicker',l:'Kicker'},{k:'headline',l:'Event (dice = BOLD / Mega Camp / FR)'},{k:'tagline',l:'Event tagline'},{k:'dateline',l:'Dates & place'},{k:'sub',l:'Why go',area:1},{k:'cta',l:'Call to action'}],
+ bold:[{k:'variant',l:'Pick your angle',chips:1},{k:'coach',l:'Coach'},{k:'dateline',l:'Free first step date'},{k:'where',l:'Where'},{k:'invest',l:'Investment line'},{k:'sched',l:'Schedule — Label|Date|Time per line',area:1,rows:6},{k:'cta',l:'Call to action'}],
  podcast:[{k:'epnum',l:'Episode tag'},{k:'headline',l:'Episode title',area:1},{k:'sub',l:'Support line'},{k:'cta',l:'Call to action'}],
  stat:[{k:'kicker',l:'Kicker'},{k:'stat',l:'The number (dice = preset pairs)'},{k:'label',l:'What it means',area:1},{k:'source',l:'Fine print'},{k:'cta',l:'Call to action'}],
  quote:[{k:'quote',l:'Quote (dice = preset pairs)',area:1},{k:'attr',l:'Attribution'},{k:'role',l:'Role / context'}],
@@ -2506,6 +2521,7 @@ const state = {
     story:{problem:"You didn't get your license to drown in *paperwork*.", guide:"We've guided hundreds of Indy agents through this exact wall.", plan:"Grab coffee with us\nBuild your 90-day growth plan\nRun it with coaching + leverage", cta:"Start the plan → heykw.com"},
     win:{kicker:"JUST CLOSED", headline:"123 Maple St. — *SOLD*", sub:"Huge congrats to the team on another happy Indy family.", cta:"Your turn → heykw.com"},
     kwevent:{kicker:"THE BIG STAGE", headline:"Mega Camp 2026", tagline:"Lock In. Level Up.", dateline:"AUG 17–20 · SAN ANTONIO, TX", sub:"Four days of leads, listings, leverage, and wealth — with the entire KW world in one building.", cta:"Roll with us → heykw.com"},
+    bold:{variant:"Afford it?", coach:"Scott Toombs", dateline:"WED · SEPT 30 · FREE FIRST STEP", where:"48 N. Emerson Ave, Greenwood", invest:"$799 · avg return 10 deals", sched:"FREE FIRST STEP|SEPT 30|9:00–2:00\nSTEP TWO|OCT 7|9:00–2:30\nSTEP THREE|OCT 14|9:00–2:30\nSTEP FOUR|OCT 21|9:00–2:30\nSTEP FIVE|OCT 28|9:00–2:30\nSTEP SIX|NOV 4|9:00–2:30", cta:"Scan to register free"},
     event:{kicker:"SAVE THE DATE", headline:"Career Night", dateline:"THU · AUG 20 · 5:30 PM", sub:"Keller Williams Indy Metro Partners · Indianapolis", cta:"RSVP → heykw.com"},
     podcast:{epnum:"EP. 012", headline:"Your database is your net worth", sub:"New episode — streaming everywhere you listen.", cta:"Listen → Big Real Estate Energy"},
     stat:{kicker:"REAL MATH", stat:"$18K", label:"commission cap. Then you keep 100%.", source:"The KW Indy Metro Partners model", cta:"See the model → heykw.com"},
@@ -2532,6 +2548,7 @@ function getColors(){
   else if(state.theme==='graphite') c = {bg:'#E8E8EC', ink:'#141419', sub:'#50505A', accent:RED, soft:'#D9D9E0', line:'#C7C7D0', chipInk:'#FFFFFF'};
   else if(state.theme==='blackout') c = {bg:'#000000', ink:'#FFFFFF', sub:'#A6A6B0', accent:shade(RED,1.16), soft:'#131316', line:'#222228', chipInk:'#FFFFFF'};
   else if(state.theme==='spine') c = {bg:'#FFFFFF', ink:'#131318', sub:'#4D4D4D', accent:RED, soft:'#F0F0F3', line:'#E3E3E8', chipInk:'#FFFFFF'};
+  else if(state.theme==='boldpurple') c = {bg:'#241242', ink:'#FFFFFF', sub:'#C9AFF0', accent:'#C9AFF0', soft:'#31195C', line:'rgba(201,175,240,0.30)', chipInk:'#2A1650'};
   else c = {bg:'#F6F1E8', ink:'#181611', sub:'#5A554B', accent:RED, soft:'#EBE3D4', line:'#DDD4C2', chipInk:'#FFFFFF'};
   c.theme = state.theme; c.red = RED; c.photo = hasPhoto;
   if(hasPhoto){ c.ink='#FFFFFF'; c.sub='rgba(255,255,255,.88)'; if(state.theme!=='redfield') c.accent=shade(RED,1.15); }
@@ -2545,6 +2562,7 @@ const THEME_META = [
   {key:'graphite', name:'Graphite', dot:'#CE011F', bg:'#E8E8EC'},
   {key:'blackout', name:'Blackout', dot:'#FF2742', bg:'#000000'},
   {key:'spine', name:'Spine', dot:'#CE011F', bg:'linear-gradient(90deg,#CE011F 0 26%,#FFFFFF 26%)'},
+  {key:'boldpurple', name:'BOLD Purple', dot:'#C9AFF0', bg:'#241242'},
 ];
 
 /* ---------- math & text helpers ---------- */
@@ -2786,6 +2804,19 @@ function drawMotif(ctx,W,H,tn,c){
     ctx.beginPath(); ctx.arc(W*1.02+dx, H*0.5+dy, H*0.44, 0, 7); ctx.stroke();
     ctx.fillStyle='rgba(232,17,45,0.9)';
     const s=H*0.01; ctx.fillRect(W-mm-s, mm*0.7-s/2, s, s);
+  } else if(c.theme==='boldpurple'){
+    // 165° gradient wash over the deep-purple field, matching the Onward BOLD promo look
+    const g = ctx.createLinearGradient(W*0.15,0,W*0.85,H);
+    g.addColorStop(0,'#31195C'); g.addColorStop(0.55,'rgba(36,18,66,0)'); g.addColorStop(1,'#150A2B');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    const orb = ctx.createRadialGradient(W*0.82+dx,H*0.16+dy,0,W*0.82,H*0.16,H*0.5);
+    orb.addColorStop(0,'rgba(107,63,160,0.45)'); orb.addColorStop(1,'rgba(107,63,160,0)');
+    ctx.fillStyle=orb; ctx.fillRect(0,0,W,H);
+    const orb2 = ctx.createRadialGradient(W*0.1-dx,H*0.9,0,W*0.1,H*0.9,H*0.45);
+    orb2.addColorStop(0,'rgba(75,42,130,0.5)'); orb2.addColorStop(1,'rgba(75,42,130,0)');
+    ctx.fillStyle=orb2; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(201,175,240,0.22)'; ctx.lineWidth=Math.max(2,H*0.0022);
+    ctx.beginPath(); ctx.arc(W*0.92+dx, H*0.78+dy, H*0.2, 0, 7); ctx.stroke();
   } else if(c.theme==='spine'){
     const bw = Math.round(0.07*Math.min(W,H))*0.52;
     ctx.fillStyle=c.red; ctx.fillRect(0,0,bw,H);
@@ -2855,7 +2886,7 @@ function drawBrand(ctx,W,H,tn,c){
       ctx.drawImage(lg, m, y-lh+fs*0.3, Math.min(lw, W*0.3), lh);
     } else {
       const s = fs*0.62;
-      ctx.fillStyle = c.theme==='redfield'? '#FFFFFF' : c.red;
+      ctx.fillStyle = c.theme==='redfield'? '#FFFFFF' : c.theme==='boldpurple'? c.accent : c.red;
       if(c.photo) ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(m, y-s-fs*0.12, s, s);
       ctx.font=`800 ${fs}px ${DISPLAY}`; setLS(ctx, fs*0.14);
@@ -3048,6 +3079,7 @@ function drawTemplate(ctx,W,H,tn,c){
     if(state.type==='recruiting' || state.type==='win') drawConfetti(ctx,W,H,tn,c,3);
   }
   else if(state.type==='story'){ drawStory(ctx,W,H,tn,c,f); }
+  else if(state.type==='bold'){ drawBoldPromo(ctx,W,H,tn,c,f); }
   else if(state.type==='kwevent'){
     leftStack(ctx,W,H,tn,c,[
       {kind:'chips', items:[{text:f.kicker, style:'solid'}]},
@@ -3276,6 +3308,216 @@ function drawStory(ctx,W,H,tn,c,f){
   }
 }
 
+/* ---------- BOLD Promo sequences — 12 angles from Chad's Onward BOLD deck,
+   the Bet-on-BOLD leadership conversations, and the Indy Metro campaign art ---------- */
+function drawBoldPromo(ctx,W,H,tn,c,f){
+  const minD=Math.min(W,H), m=Math.round(0.07*minD), cw=W-2*m, cx=W/2;
+  const loopMode = state.anim==='pulse';
+  let vi = (BANKS.bold.variant||[]).indexOf(f.variant); if(vi<0) vi=0;
+
+  /* item builders — measured blocks drawn centered in a vertical stack */
+  const chipIt = (text, style, big)=>{ const fs=minD*(big?0.031:0.0255), km=chipMetrics(ctx,text,fs,W);
+    return {h:km.h+minD*0.045, draw:y=>drawChip(ctx,text,(W-km.w)/2,y,km,c,style||'solid')}; };
+  const fitIt = (text, o, color, gap)=>{ const fb=fitBlock(ctx,text,o);
+    return {h:fb.h+(gap!=null?gap:minD*0.04), draw:y=>drawLines(ctx,fb,cx,y,color||c.ink,'center',c.accent)}; };
+  const numIt = (target, suffix, local, sizeMul)=>{ const size=minD*0.24*(sizeMul||1);
+    return {h:size*1.02, draw:y=>{ const p=eoExpo(clamp01(local/0.55));
+      ctx.font=fontStr({weight:900,disp:true},size); setLS(ctx,-0.02*size);
+      ctx.fillStyle=c.accent; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+      ctx.fillText(Math.round(target*p).toLocaleString('en-US')+(p>=1?(suffix||''):''), cx, y+size*0.86);
+      setLS(ctx,0); ctx.textAlign='left'; }}; };
+  const imgIt = (dMul)=>{ const dd=minD*0.24*(dMul||1);
+    return {h:dd+minD*0.05, draw:y=>{ const cyy=y+dd/2;
+      ctx.save();
+      ctx.strokeStyle=c.accent; ctx.lineWidth=Math.max(3,minD*0.006); ctx.lineCap='round';
+      ctx.beginPath(); ctx.arc(cx,cyy,dd/2+minD*0.012,0,7); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cyy,dd/2,0,7); ctx.clip();
+      if(typeof SCOTT_IMG!=='undefined' && SCOTT_IMG){
+        const s2=Math.max(dd/SCOTT_IMG.width,dd/SCOTT_IMG.height);
+        ctx.drawImage(SCOTT_IMG,cx-SCOTT_IMG.width*s2/2,cyy-SCOTT_IMG.height*s2/2,SCOTT_IMG.width*s2,SCOTT_IMG.height*s2);
+      } else {
+        ctx.fillStyle=c.soft; ctx.fillRect(cx-dd/2,cyy-dd/2,dd,dd);
+        ctx.fillStyle=c.accent; ctx.font=`900 ${dd*0.3}px ${DISPLAY}`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText((f.coach||'S T').split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase(), cx, cyy);
+        ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+      }
+      ctx.restore(); }}; };
+  const barsIt = (schedStr, local)=>{
+    const rows = String(schedStr||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8)
+      .map(l=>{ const p=l.split('|'); return {label:(p[0]||'').trim(), date:(p[1]||'').trim(), time:(p[2]||'').trim()}; });
+    const bh=minD*0.06, gap=bh*0.36, w=Math.min(cw*0.9, minD*0.82);
+    return {h:rows.length*(bh+gap)+minD*0.01, draw:y0=>{
+      rows.forEach((r,i)=>{
+        const sp=clamp01((local-0.1-i*0.09)/0.16); if(sp<=0) return;
+        const e=eoExpo(sp), y=y0+i*(bh+gap);
+        const x=(W-w)/2 + (1-e)*W*0.08;
+        ctx.save(); ctx.globalAlpha*=Math.min(1,sp*1.6);
+        ctx.fillStyle = state.theme==='boldpurple' ? '#6B3FA0' : c.accent;
+        rr(ctx,x,y,w,bh,bh*0.5); ctx.fill();
+        const tf = state.theme==='boldpurple' ? '#FFFFFF' : c.chipInk;
+        const fs=bh*0.33;
+        ctx.textBaseline='alphabetic'; ctx.fillStyle=tf;
+        ctx.font=`800 ${fs}px ${DISPLAY}`; setLS(ctx,fs*0.06); ctx.textAlign='left';
+        ctx.fillText(r.label.toUpperCase(), x+bh*0.6, y+bh*0.64);
+        ctx.textAlign='right';
+        ctx.font=`900 ${fs*1.08}px ${DISPLAY}`;
+        ctx.fillText(r.date.toUpperCase(), x+w-bh*0.6, y+bh*0.46);
+        ctx.font=`600 ${fs*0.8}px ${DISPLAY}`;
+        ctx.fillText(r.time, x+w-bh*0.6, y+bh*0.87);
+        setLS(ctx,0); ctx.textAlign='left'; ctx.restore();
+      });
+    }}; };
+  const rowsIt = (rows, local, mode, scale)=>{ // mode: 'num' | 'facts' | 'plain'
+    const sfs=minD*(mode==='plain'?0.05:0.042)*(scale||1), rowH=sfs*2.0;
+    return {h:rows.length*rowH+minD*0.02, draw:y0=>{
+      rows.forEach((r,i)=>{
+        const sp=clamp01((local-0.18-i*0.12)/0.18); if(sp<=0) return;
+        const y=y0+i*rowH;
+        ctx.save(); ctx.globalAlpha*=eoCubic(sp); ctx.translate((1-eoBack(sp))*-minD*0.015,0);
+        ctx.textBaseline='alphabetic'; ctx.textAlign='left';
+        if(mode==='num'){
+          const num=String(i+1).padStart(2,'0');
+          ctx.font=`900 ${sfs}px ${DISPLAY}`;
+          const numW=ctx.measureText(num).width;
+          ctx.font=`700 ${sfs*0.68}px ${DISPLAY}`;
+          let txt=r; while(ctx.measureText(txt).width>cw*0.7&&txt.length>4) txt=txt.slice(0,-2);
+          const rw=numW+sfs*0.45+ctx.measureText(txt).width, x=(W-rw)/2;
+          ctx.font=`900 ${sfs}px ${DISPLAY}`; ctx.fillStyle=c.accent; ctx.fillText(num,x,y+rowH*0.6);
+          ctx.font=`700 ${sfs*0.68}px ${DISPLAY}`; ctx.fillStyle=c.ink; ctx.fillText(txt,x+numW+sfs*0.45,y+rowH*0.6);
+        } else if(mode==='facts'){
+          ctx.font=`800 ${sfs*0.62}px ${DISPLAY}`; setLS(ctx,sfs*0.07);
+          const A=r.a.toUpperCase(), aW=ctx.measureText(A).width; setLS(ctx,0);
+          ctx.font=`700 ${sfs*0.72}px ${DISPLAY}`;
+          let bTxt=r.b; while(ctx.measureText(bTxt).width>cw*0.58&&bTxt.length>4) bTxt=bTxt.slice(0,-2);
+          const rw=aW+sfs*0.55+ctx.measureText(bTxt).width, x=(W-rw)/2;
+          ctx.font=`800 ${sfs*0.62}px ${DISPLAY}`; setLS(ctx,sfs*0.07);
+          ctx.fillStyle=c.accent; ctx.fillText(A,x,y+rowH*0.58); setLS(ctx,0);
+          ctx.font=`700 ${sfs*0.72}px ${DISPLAY}`; ctx.fillStyle=c.ink;
+          ctx.fillText(bTxt,x+aW+sfs*0.55,y+rowH*0.58);
+        } else {
+          ctx.font=`900 ${sfs}px ${DISPLAY}`; ctx.fillStyle=(i===rows.length-1)?c.accent:c.ink;
+          ctx.textAlign='center'; ctx.fillText(r,cx,y+rowH*0.6); ctx.textAlign='left';
+        }
+        ctx.restore();
+      });
+    }};
+  };
+  const Q  = {maxW:cw*0.86, maxH:H*0.28, max:minD*0.082, min:24, weight:700, family:SERIF, italic:true, lh:1.22, ls:0};
+  const H1 = {maxW:cw*0.92, maxH:H*0.3, max:minD*0.105, min:26, weight:900, lh:1.05, ls:-0.012, rich:true, disp:true};
+  const H2 = {maxW:cw*0.92, maxH:H*0.22, max:minD*0.075, min:22, weight:900, lh:1.08, ls:-0.012, rich:true, disp:true};
+  const SUB= {maxW:cw*0.86, maxH:H*0.1, max:minD*0.038, min:16, weight:600, lh:1.25, ls:0};
+
+  const CTA = l=>[fitIt('Not ready to commit? Start *free*.',H2), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)];
+  const CTAF = l=>[fitIt('See it for yourself — *free*.',H2), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)];
+  const ALL = [
+   /* 0 · Afford it? */ [
+    {w:2.2, items:l=>[fitIt('“I don’t have the money for BOLD.”',Q), fitIt('We hear it all the time.',SUB,c.sub)]},
+    {w:2.0, items:l=>[chipIt('THE TRUTH'), fitIt('Saving money doesn’t create freedom.',H2), fitIt('*Earning more* does.',H1)]},
+    {w:2.4, items:l=>[numIt(10,'',l), fitIt('transactions in 6 weeks — the average *BOLD* student.',H2), fitIt('One extra closing pays for BOLD many times over.',SUB,c.sub)]},
+    {w:1.9, items:l=>[fitIt('So the real question isn’t “can I afford it?”',SUB,c.sub), fitIt('Can you afford *not* to?',H1)]},
+    {w:2.3, items:l=>[chipIt('ONWARD BOLD'), rowsIt([{a:'What',b:'6 one-day classes · 6 weeks'},{a:'By',b:'Written by Gary Keller'},{a:'Where',b:f.where},{a:'Invest',b:f.invest}],l,'facts')]},
+    {w:2.6, items:CTA},
+   ],
+   /* 1 · Do the math */ [
+    {w:2.1, items:l=>[chipIt('QUICK QUESTION'), fitIt('Are you closing 10 transactions every 6 weeks?',H2)]},
+    {w:2.2, items:l=>[fitIt('The average BOLD student *is*.',H2), numIt(10,'+',l), fitIt('deals · 6 weeks',SUB,c.sub)]},
+    {w:2.2, items:l=>[fitIt('What would 10 more closings mean?',H2), rowsIt(['More income','More freedom','More family time'],l,'plain')]},
+    {w:2.4, items:l=>[chipIt('INSIDE BOLD'), rowsIt(['Lead generation that compounds','Listing & buyer presentations','Social media that converts','Wealth & money habits'],l,'num')]},
+    {w:2.2, items:l=>[fitIt('All-new *Onward BOLD*',H2), fitIt('Rewritten by Gary Keller for today’s market — streamlined to 6 weeks, gamified tracking, built-in accountability.',SUB,c.sub)]},
+    {w:2.4, items:CTAF},
+   ],
+   /* 2 · Free first step */ [
+    {w:2.1, items:l=>[chipIt('BE HONEST'), fitIt('Rate your real estate career, 1–10.',H2)]},
+    {w:2.2, items:l=>[fitIt('Not a 10? What would make it one?',H2), rowsIt(['More consistency','More closings','More life'],l,'plain')]},
+    {w:2.3, items:l=>[fitIt('*BOLD*',{...H1,max:minD*0.17,maxH:H*0.22,lh:1}), fitIt('Business Objective: A Life by Design',H2), fitIt('The all-new coaching program written by Gary Keller.',SUB,c.sub)]},
+    {w:2.2, items:l=>[fitIt('Step one is *free*.',H1), fitIt('5 hours. No obligation. Just experience what’s possible for your business.',SUB,c.sub)]},
+    {w:2.5, items:l=>[fitIt('Seats fill fast. Wouldn’t it be worth seeing for yourself?',H2), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)]},
+   ],
+   /* 3 · No time? */ [
+    {w:2.2, items:l=>[fitIt('“I don’t know if I have time for BOLD.”',Q), fitIt('Fair. Quick question…',SUB,c.sub)]},
+    {w:2.0, items:l=>[fitIt('Did you hit your income goals last year?',H2), fitIt('So what will you do differently this year?',SUB,c.sub)]},
+    {w:2.2, items:l=>[chipIt('THE TRUTH'), fitIt('Time never magically appears.',H2), fitIt('You *buy it back*.',H1)]},
+    {w:2.2, items:l=>[fitIt('Top agents buy back time with',H2), rowsIt(['Efficiency','Leverage','Focus'],l,'plain')]},
+    {w:2.2, items:l=>[fitIt('Another year of “too busy, not enough income”?',SUB,c.sub), fitIt('Or finally *own your schedule*?',H1)]},
+    {w:2.4, items:l=>[fitIt('One day a week · 6 weeks · that’s it.',H2), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)]},
+   ],
+   /* 4 · Round two (grads) */ [
+    {w:2.2, items:l=>[chipIt('TOOK BOLD BEFORE?'), fitIt('“It was okay… I didn’t get my 10 deals.”',Q)]},
+    {w:2.2, items:l=>[fitIt('Honest question: did you play full-on… at a *level 10*?',H2), fitIt('What you put in is what you get out.',SUB,c.sub)]},
+    {w:2.4, items:l=>[chipIt('THIS ISN’T THAT BOLD'), rowsIt(['Rewritten by Gary Keller','New BOLD laws + 10 truths','Gamified tracking','6 weeks, not 7'],l,'num')]},
+    {w:2.0, items:l=>[fitIt('Round two, played at a 10?',H2), fitIt('Different input. *Different result*.',H1)]},
+    {w:2.5, items:l=>[fitIt('Alumni — *run it back*.',H2), chipIt(f.invest,'outline'), chipIt('Scan to lock your seat','solid',true)]},
+   ],
+   /* 5 · Sign up now */ [
+    {w:2.0, items:l=>[fitIt('Already know you’re in?',H1), fitIt('This one’s for you.',SUB,c.sub)]},
+    {w:2.2, items:l=>[fitIt('*BOLD*',{...H1,max:minD*0.17,maxH:H*0.22,lh:1}), fitIt('6 one-day classes · 6 weeks · written by Gary Keller',SUB,c.sub)]},
+    {w:2.4, items:l=>[chipIt('THE DETAILS'), rowsIt([{a:'Kickoff',b:'Free first step · Sept 30'},{a:'Coach',b:'MAPS Coach '+f.coach},{a:'Where',b:f.where},{a:'Invest',b:f.invest}],l,'facts')]},
+    {w:2.2, items:l=>[numIt(10,'',l,0.8), fitIt('deals in 6 weeks — the average BOLD student. One closing pays for it many times over.',SUB,c.sub)]},
+    {w:2.6, items:l=>[fitIt('Decide once. *Lock your seat*.',H2), fitIt('See you in the room.',SUB,c.sub), chipIt('Scan to register now','solid',true)]},
+   ],
+   /* 6 · Meet your coach */ [
+    {w:2.3, items:l=>[chipIt('YOUR BOLD COACH'), imgIt(1.1), fitIt(f.coach,{...H1,max:minD*0.095}), fitIt('MAPS BOLD Coach · Onward BOLD Indy Metro',SUB,c.sub)]},
+    {w:2.3, items:l=>[fitIt('“Join Coach '+(f.coach||'').split(' ')[0]+' in this life-changing event.”',Q), fitIt('Focus on gratitude. Shift your perspective. Build the business that serves your life.',SUB,c.sub)]},
+    {w:2.2, items:l=>[imgIt(0.8), rowsIt([{a:'Kickoff',b:'Free first step · Sept 30'},{a:'Where',b:f.where}],l,'facts')]},
+    {w:2.5, items:l=>[fitIt('Ready to build YOUR life *by design*?',H2), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)]},
+   ],
+   /* 7 · The schedule */ [
+    {w:1.8, items:l=>[chipIt('ONWARD BOLD · INDY METRO'), fitIt('Business Objective: *Life by Design*',H2)]},
+    {w:3.4, items:l=>[barsIt(f.sched,l)]},
+    {w:2.4, items:l=>[fitIt('All Wednesdays · led by MAPS Coach '+f.coach,SUB,c.sub), fitIt('Start with the *free* first step.',H2), chipIt(f.cta,'solid',true)]},
+   ],
+   /* 8 · What we accomplish */ [
+    {w:1.8, items:l=>[chipIt(('WITH COACH '+(f.coach||'')).toUpperCase()), fitIt('Here’s what we will accomplish…',H2)]},
+    {w:3.6, items:l=>[rowsIt(['Embrace accountability','Set appointments & get agreements','Establish your cadence & live your schedule','Build your lead gen & service plan','Decide your MOFIRs','Create your brand, position & presentations','Set your goals'],l,'num',0.82)]},
+    {w:2.4, items:l=>[fitIt('Six Wednesdays. *One transformed business*.',H2), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)]},
+   ],
+   /* 9 · Life by design */ [
+    {w:2.4, items:l=>[fitIt('Are you ready to build *YOUR* life by design?',H1)]},
+    {w:2.4, items:l=>[fitIt('Onward BOLD helps you focus on gratitude and shift your perspective — to one that serves you *and* your business.',{...H2,max:minD*0.055,weight:700})]},
+    {w:2.2, items:l=>[imgIt(0.9), fitIt('with MAPS BOLD Coach '+f.coach,SUB,c.sub)]},
+    {w:2.5, items:l=>[fitIt('Free first step · no obligation',SUB,c.sub), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)]},
+   ],
+   /* 10 · The MLS test */ [
+    {w:2.2, items:l=>[chipIt('A QUICK TEST'), fitIt('If the MLS said: pay $799 today or go *inactive*…',H2)]},
+    {w:2.0, items:l=>[fitIt('You’d find it.',H1), fitIt('Because staying in this business matters to you.',SUB,c.sub)]},
+    {w:2.2, items:l=>[fitIt('BOLD isn’t a fee.',H2), fitIt('It’s the investment that keeps you *producing*.',H2)]},
+    {w:2.5, items:l=>[fitIt('Treat it with the same urgency.',SUB,c.sub), chipIt(f.dateline,'outline'), chipIt(f.cta,'solid',true)]},
+   ],
+   /* 11 · 10,000 agents */ [
+    {w:2.2, items:l=>[fitIt('“I can’t afford BOLD.”',Q), fitIt('Most of the 10,000+ agents who took it said the same thing.',SUB,c.sub)]},
+    {w:2.3, items:l=>[numIt(10000,'+',l,0.7), fitIt('agents did it *anyway*.',H2)]},
+    {w:2.0, items:l=>[fitIt('Their average: *10+ transactions* in 6 weeks.',H2)]},
+    {w:2.2, items:l=>[fitIt('If you’d closed 10 more in the last 6 weeks…',SUB,c.sub), fitIt('would we even be having this *conversation*?',H2)]},
+    {w:2.5, items:CTA},
+   ],
+  ];
+  const scenes = ALL[vi] || ALL[0];
+
+  const T = scenes.reduce((a,s)=>a+s.w,0);
+  let acc=0;
+  const wins = scenes.map(s=>{ const a=acc/T; acc+=s.w; return [a, acc/T]; });
+  let idx = wins.findIndex(w=>tn>=w[0]&&tn<w[1]); if(idx<0) idx=scenes.length-1;
+  const local=(tn-wins[idx][0])/(wins[idx][1]-wins[idx][0]);
+  const ain=eoCubic(clamp01(local/0.18));
+  const aout=(idx===scenes.length-1&&!loopMode)?0:eio(clamp01((local-0.87)/0.13));
+  ctx.save();
+  ctx.globalAlpha=ain*(1-aout);
+  ctx.translate(0,(1-ain)*H*0.03 - aout*H*0.04);
+  const items = scenes[idx].items(local);
+  const total = items.reduce((a,it)=>a+it.h,0);
+  let y=(H-total)/2 - H*0.03;
+  const qg = qrGeom(W,H);
+  if(qg && y+total > qg.top - minD*0.02){ y = Math.max(m*1.05, qg.top - minD*0.02 - total); }
+  items.forEach(it=>{ it.draw(y); y+=it.h; });
+  ctx.restore();
+  const dr=Math.max(3,minD*0.005), dgap=dr*3.4, dw=(scenes.length-1)*dgap;
+  for(let i=0;i<scenes.length;i++){
+    ctx.beginPath(); ctx.arc(cx-dw/2+i*dgap, H-m*1.9, dr, 0, 7);
+    ctx.fillStyle = i===idx ? c.accent : 'rgba(128,128,140,0.35)'; ctx.fill();
+  }
+}
+
 function drawConfetti(ctx,W,H,tn,c,beatIdx){
   if(state.anim==='pulse' || !lastCtaBox) return;
   const {d,stag,start} = beatTimes();
@@ -3299,7 +3541,7 @@ function drawConfetti(ctx,W,H,tn,c,beatIdx){
 /* ---------- QR rendering ---------- */
 let qrCache = {key:'', cv:null, err:false};
 function getQRCanvas(){
-  const key = state.qr.url+'|'+state.qr.style+'|'+state.brandRed;
+  const key = state.qr.url+'|'+state.qr.style+'|'+state.brandRed+'|'+state.theme;
   if(qrCache.key===key) return qrCache.err ? null : qrCache.cv;
   qrCache = {key, cv:null, err:false};
   try{
@@ -3309,7 +3551,8 @@ function getQRCanvas(){
     const cv = document.createElement('canvas'); cv.width = cv.height = S;
     const c2 = cv.getContext('2d');
     c2.fillStyle='#FFFFFF'; c2.fillRect(0,0,S,S);
-    const dark = '#141419', red = state.brandRed, style = state.qr.style;
+    const dark = '#141419', style = state.qr.style;
+    const red = state.theme==='boldpurple' ? '#4B2A82' : state.brandRed; // purple theme → purple accents (still scan-dark)
     const inFinder = (r,cc)=> (r<7&&cc<7)||(r<7&&cc>=n-7)||(r>=n-7&&cc<7);
     // data modules
     for(let r=0;r<n;r++) for(let cc=0;cc<n;cc++){
@@ -3431,7 +3674,7 @@ function drawFrame(ctx,W,H,tn){
       const e = eio(pw);
       const x = -W*0.3 + e*(W*1.6);
       ctx.save(); ctx.translate(x, H/2); ctx.rotate(-0.06);
-      ctx.fillStyle = c.theme==='redfield' ? '#FFFFFF' : c.red;
+      ctx.fillStyle = c.theme==='redfield' ? '#FFFFFF' : c.theme==='boldpurple' ? '#6B3FA0' : c.red;
       ctx.globalAlpha = 0.97;
       ctx.fillRect(-W*0.09, -H*0.75, W*0.18, H*1.5);
       ctx.restore();
@@ -3443,6 +3686,19 @@ function drawFrame(ctx,W,H,tn){
   drawPbar(ctx,W,H,rawTn,c);
   ctx.restore();
 }
+
+/* ---------- Coach Scott Toombs headshot (embedded for the BOLD Promo template) ---------- */
+const SCOTT_B64 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAwQEAwQFBAQFBgoHBgYGBg0JCggKDw0QEA8NDw4RExgUERIXEg4PFRwVFxkZGxsbEBQdHx0aHxgaGxr/2wBDAQQFBQYFBgwHBwwaEQ8RGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhr/wAARCAEYARgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD8/wCiiigAooooAKKKmtbSa8lEVshdzz6AD1J6Ae9NJt2QENaUGlERLcalKLO3bldwy8g/2V7/AFPFP8200ri22Xt2OsrLmND/ALIP3vqeKzp55bmVpbiRpZG6sxyTWtoQ+LV/h/Xp95Wi3NBtVS1G3R4fs3/TZvmlP0P8P4VmMzOxZ2LMTkknJNJRUSnKe4m2woooqBBRRRQAUUUUAFFFFABRVi1sri9kEdrC8rnsqk10UPw812aAym2WMD+F5AD+VA7NnK0Vp3/h/UtMG68tJET+8BkfmKzKBBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFW7Kz+0lnlfybaPmSQjOPYepPpVRi5OyGlcSzsmuyzFhDAnMkrdFH9T7VPdaggiNrpqtDa/wATH78vux/p0qK9vftAWGBPJtY/uR5/8eJ7k1TrRyUFyx+/+ug720QUUUViSFFFFABRRRQAUUUUAFFFFAAASQByTXWaL4V8wLJqEbln/wBXCv3mPv6Cq3hSxjeWS8nUOIiFiU93P+Ar6m+Cfw1j1EnXdZTeN2LdGHHu3+fSuetV9nFs68PQdaaRyfgj4L+INUgSSGKPTbZsYBHzY9TXsukfs87kVtR1C7dsf8syFH5V7zoWm28EKJHEML0rrrfTleMdq89VKlXW57nsaFFWsfJ3iL9nyZYXbRb87+f3dzGGVvrjpXzb8RfhTc+H52/tPT20qZj8sqDdDIfY1+oVxo8OM7RXHeM/BWmeJtGubDU7ZJ4ZUIwygkH1HoatVKlF6u6M6lChXXuqzPyPvLOaxmaK4Xaw/Ij1FQV7R4/+H8ml6vqmizpul05z5MuMExnlT7ivG5omgleKQYZCQa9OMlJXR8/ODpycWR0UUVRAUUUUAFFFFABRRRQAUUUUAFFFFABRRT4onmkSOJSzuQFA7mjcCaxs2vZSoYJGi7pJD0RfU0++vFm2Q2ymO0i4jXuT3Y+5qS9mS3i+w2rAopzM4/5aP/gO34ms+tpPkXKvn/kU9NAooorEkKKKKACiiigAooooAKKKKACiigDJwOpoA7Xw/ZOsVoIzkv8AN7Lk4J+tfffw/tksvD+mW8WAqxLx+FfD/h3TZre4sLWVWWQlAVIweef619t6BqNtocFit2QzGNQB68V5WMd7JHt4BcrbZ7LpkG+NSvBHpW/DvULg8V5UPiPa6PzPaXRjxwwjyK6XRfHltrS5tRgDs3WuanKMFqz05wlN6HaSux7g1jai+1WBGeKjOv2SuI5rhI39GbFVr+9gkDFZFbIPQ0qkuaN0EIcrsz5L/aI05LDxBZasi4a4h8qTHfa3H6GvjvxGqrrV55YIUvnB7V9n/tLzLJpum7T8wnb8uK+LdfkEurXLDn5sH616OCk3SVzw8wSVZ2M2iiiu480KKKKACiiigAooooAKKKKACiiigArSjH9nWfnHi5uVIj9UToW+p5H0zVawt1uJ/wB8SsEYLyt6KP6noPcim3ly13cPKwC54VR0VR0A/CtY+5Hm69P8ylorkFFFFZEhRRRQAUUUUAFFFFABRRRQAUUUUAFbvgqxj1PxhoVlON0VxfwxuPUFwDWFXSfD6Qw+OvDbqMldStyAf+ugqZfCzWlb2kb90fS994S2+PNGfcoVvmk92HP8q9+sNCur1UktUgkcAhPNQnBx2ry7U5IpviVZafEQ6WCGWRj2YgACvafD+srBcRxAjag6V87O/uqTPs6MI1KtRxXU4jV9P8RL5kUmvzxTIeLdNPGPpnnI/Guj+FWgXkeoXVzrTiT93ny9u3n1xXa6p4w0+ILbxqj3Up2rz0Pqaq6BJLBNqRuFRmEfysnRgacYxclrdI1cdGrWfqeV+NLrULvXbu2j0uS9hEu2NElCEr60zSJYnY20UepaTfKpPlXbHY59A3Q16vb2On3siQ6siwTOMxMTyf8A69azaHpdpC4CC4d+rTHf/OsFCUU7P+vQcoxb/wCAfI3x5a5kOkQSZMpjZiOvORXyFfyie9nkAwGckV9tfGdbbT729vJ1407TpZYueOOg/PA/Gvh0nJJPevawMuamfMZlTUKl77/pYKKKK9A8gKKKKACiiigAooooAKKKKACiiigC/Ni10+KEcS3H7yT2X+EfzP5VQqe8uTd3MkxUIGPyqOijsPwGBUFXNpvTYbCiiioEFFFFABRRRQAUUUUAFFFFABRRRQAVLbzyWtxFPA5jlicOjDqCDkGoqKAPo3wV4kvb28fWtQmMk0gUs3dj3P6V7k3jW10nwvda8JBKyAL5SnkuelfLPg7USLC1R2GGTA/Cu2Or+boN7pkz7vNkjKKf7wP/ANevJr0eeR72FxUqUW0zX1T4l6te2NzLgpLPzuUfdHpVnw18cfEei6RNFOHvG4SNyxyB7+ten/Dz4exWWoM5FlfW17AhW2uhgK+MHa4zgd+leov8L/Dc1s0TeGV8zHLQSIVPJJIOR0+lczqxirKOh2P2sZ3lN3PB9I+Mj6hFE2u3BW6zvjcHhCD0/Svc7LxdHqekwXMUnmK6DaR3r5i+KvhK2stS1NtFsDZ6ZasIlbzd5eQnHH04resfFUnhXwxp2hxSeZdJAXmcngE84rOpTVWKlDRs3p4qpRvGrrpocx+0p4iW6gnt7WU7mjWObB6jzA2PzAr5br0/4oat9rUhpNzyuMjPpzXmFe3h4KnSUUfMYqo6tVyYUUUV0HKFFFFABRRRQAUUUUAFFFKVYKGIIU9D60AJRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUqqWOFBY+gFaNr4f1O8wYLOUj1K4H61cYTm7RVyXKMd2ZtOjjaV1SMFmY4AHc10sHgXU3wZ/LhHucmuv8ACPhCyt9WsUmJmnedFLt0XLDoK7qeX15v3o2XmYSxEEtHcv6r4Xj8K2mk6bEskmpRWS3d42eFMhBAx2ABFN0lLguLsOJWDDajjPQ8n+VfRHxp+HP9keO49VSA/wBm6tpkcQI6b0wpX8sH8a8ZtNKi0HWBbTNlC2+IHIxyD9McCvLlKPt5U7bHpcklRjUXU9i0Lxtd2Phy2uTCryQHawcHAxjPSup0n4vJdqkbRGFpEIZo2J4OeOfxrh73V9PSwWBAsKuiup25BLE5H4HIqHw3p1rrtvOtrmOVH6oMjnOcenSuOWGV2j1aePkoRd9g+Jni601Oyl06yhYiGQO5HUEc4/OvGl1xpmuZTveY8KOtenfEW3t/C9rJDGm+a6Xy2YHJY9c/yHXsan+A/wAMpdftPEniHUbYPYWGm3AQsODL5Z5H0rrpYSOkUedXxc6knNnyj4gv5NQ1KVpDkIdq4rLr1jVvBdhqCNNGjQSn7zR+vriuUuvh/qceTZlLpe2DtP5GvYq5XiaXwxuvI8mOKpy3djkqKt3ul3mnPsvbaWE/7SnH51UrzZRcXaSszoTTV0FFFFSMKKKKACiiigArRh/0nSZ4jy9s4lX/AHTw39D+FZ1X9GYfb0hb7lwDCf8AgQwP1xWtL4rd9Co7lCilZSjFT1BwaKyJEooooAKKKKACiiigAooooAKdHG8zqkSs7scBVGSTTa9Q+GemQxWU2oTRq0zvsjZhyFHXFdmDwzxdZU07GNap7KHMc3Y/DvWbxVaWNLZT/wA9G5/Kuq0r4YWduQ+qztdN/wA80+VfxPU13wIapMcV9pRyjCUndrmfmePPFVp6XsZFrolhYrts7SGED0UZ/Op2hwOOlXtlROuBXqqMYq0VY5d9WZUqDazdhVPw+XOrQSoPuXCYPvuFW7jT3aUy2shQsf3inlW/+vViwhW3ntxGMASqfxyK4pwc3qjdOy0P0O8b+DE8bfD9I4lzeWyrcW577gOR+IzXyrq3gq31QEXkBDR8Ajhge+PSvoW41zXZ5be10u9ktYbSND5ScCTjnce9Uta8PLfwvqNpF/rP9fGq8xSd8+x9a/MM1w001Xp7rc+0yytF3o1NnsfNmp/DnUNU8mTS5g8UXAEvBX15xzVnTIdb8JxAW+mRSTxgqjM3AznLH1ySfpXrMNvLYTusQUh+SGFNm0SXUGVjyW4IArxo46rHzPanl1CSvax4DPoGu+LNZtLO4C3WoXMojhVR8qFj1/CvrLSNQ0Hwj4C8ReCdEtnEmn6PcebdYGJZPJYsfxINU/DXw6ufDLtq5hU6jOpjtEI5jyOXPviuH8damvgrwt4jiDB9U1WX7F5p6kMv70/98kr+NfWZXRnU1qL3pHyuYTpw92nsvzPm2CArKVccH9acIo0lZImDFeTjtWgYRLFtbIyOo4IpogSFNsahQPSv0yMbbHykncqvBHMhSaNZFPZhmue1X4e6Pqis0UJspz0eLgfivSuq21Kq4qKtClXVqkUwjOUHeLseGa18PtW0ks8MX2y3H8cQyce461yzxvGxWRWRh1DDBr6exxzWXqnh/TtXhZL+1jlz0bGGH0NfOYjIISu6EreT/wAz0KeOktJq5850Vu+LdA/4RvWZbNHMkWA8bHrtPrWFXyNSnKlNwluj1oyUkmgooorMoKVWKMGU4ZTkEdjSUUAX9ZUDUp3QYSbEygdg4DAf+PUUaj89vp8vrBsJ91Yj+WKK0q/G331+8qW5QooorMkKKKKACiiigAooooAK9o8LwfY9ItYGH/LEN+J5ryLTLNtQ1C2tk6yyBfwr2wItvPDGn3RGFH4V9Fk0PelU9EcGLeiia8L8VZBrPtpN2BV09K+xi7o8lonAyKp3L7JoVI+V2wasRNnrUWoxk25ZRlkO8fhVt+7dE9RzJtFQ2sRkvI1Ufxr/ADq3kOgI5BGRS2SiO/iY9NwP605RuJOx99+G/DomtlunHzsq/wAhWw2jSmUyWhMM2Mbl7j3q74Pb/QrSMgBZLSKRfxUV032dEOa/OqkmpNH0UX7qPP7vwauog/2hbqJgOJo1A/l1p2geGbXRSZ9V8sbGPlL6++K7l4WwywEgnt6VRn0TznR5yTg55ridCjKopuOp1rFVlTdPm0ZVWNdQmMwU+UgJGR1r43/aD3jxolnKAscERlVQc5LnJJ/ICvuBokgtdkYAB4r4K+NeojUviVrjq25IZRCvttABH55r6bJ4qeIb7I8jFu1Ox500bYDI2CO3Y01ztQswwcYx71OarzHLIo9dxr7Bq2p5Fxsa5PNSng0kY4NDUmxoDUUj7SuTwTmpW6VUeTLMPQVDlYpI82+LlpifT7sD76shP05/rXmdeyfFC0Nx4chnHJt5gT9CMf4V43X5/m8OTFyfezPbwrvSQUUUV5B1hRRRQBfn+bSLQ/3JZF/Paf6UUddFz/dusfmtFa1N0/JFMoUUUVkSFFFFABRRRQAUUUUAdn8PdMabUJb9x+6t0Kqf9o//AFs16HfHZJBJ2FYfhC1Nh4ciDDD3BMh9gelbtwnn2ieuP1r7XL6Xs8NZbvU8etLmqX+RYs3zKR6GtNjxXPaVP5lwwJ5x0rdJzXr0Zc0bnLNWZPDUr/MpB71BCcVNnNdSZkR2v+oVT1X5fyqWLi4Q+9RRHa8i/jT0OJRVJ6Il7n6M+E5Q3h7wxer0eyiRj/wAf4V2hwTk9BXn3w+lF18LfDsqnJjtE59xXdRuZIEb1WvzmurVGvNn0FPWKLMC/Kzdyc025bhR606I4iA9qrzsDNGv41zrc0Ir11jjy/ARSxr84PE1+dV8Q6relt/2i7lkDeoLGv0B8fasNE8I69qLMFNvYyshP9/ado/PFfnZj1r6vI4aTl6I83GPVIY3AqFYpJElnEbGJCFLgcD0yffmnTttU819bfALwHo3iP4QTQanbJMmqXEyzsR8wKHapB7EdRXt4zFLCU/aNX1scdGn7WXKfI6H+EDk1Pe2N1p0iJfW8ts7qGUSIVJU9CM9q+5NK/Z38F6ZdaPdCze4n0xSBvb5Z26hpB3INJ8cvhlB4+8OEWMSx6xYqXtXCj5gBzGfY9vevJ/tmjKpGKWnVnUsHNJts+E5Pu/UVnhtzk+pq9eJJaiWOdTHLExVlPUEcEVlQtuG78BXsSkmzlSI/Etl/aPh7ULcDcTASo9xyP5V8+dK+l0USKyZ+8pBr5wv7drS+uYH+9FKyH8DXyeew96E/VHpYN7or0UUV8yeiFFFFAF8f8gRv+vof+gGihvl0ZB/fuCfyX/69FaVOnoUyhRRRWZIUUUUAFFFFABUttF59zDF/fdV/M1FW14Usze67arjKxnzG+g/+vitKUHUmorqyZPli2ereWYCkQGEVAij2AqSNyYJI/4kO5RRJJvUK33wNymq084jdWGQT3r71NQd0eLbmI9OkUalIyn5WXP0Oa3/ADgTxXJW82NSmJUoxUZ9Dz1roYGyAaKFTdIKkepqRtVgGqMTVZVq9GLOdofJ8txGf7wKmpAfnFV7pwsYc/wEH8O9T9wauL1aJaPvr4JTG4+EWjbjnETL+TGvSLBt1lHnsK8j/Zxuvtnwot0JyYppUx9DXrOnHNmo+tfBYxWr1F5s9uj/AA4+heU5jHHFVigN1kHOBUpbaoFVIZB58pByR1rjS3Njx/8Aaa8RLpvgGXTomxJqE6Rt/ug7j/IV8aD3r6J/atvl87w9Z5PmMZZj7jgV857sCvuMpgoYVPuePiXeoyneOQ3HbmvsL9kjX/tvw+vbOYhVstQdUPswDc/iTXxzctlGbGdxwK9H+D/xiPwp0jUrRtKbUZbu480ETbFUBcY6VOZxlWo8kVdjw9oz5mfoMkiYBDBvYGuS8feKY/CPhXV9dlG42cLNGo5LN0UY+tfLmpftb+Jp0xpGj6dZZHDS7pSP1FeU+J/ib4o8ayFvEerTXCZyIVxHEv0VcD868ChlVVyTqOyO6eJjb3Tk/EOrTX00lxc5+03kpkkyMcscmqcZ+6q9BVPWJTLeQKpwOSxqaCYgYC8dq+lUlzNHn20NS2bLYz0rxf4i2Udn4nufJwBKqyMB2JHNeyWzhGZmHavK/ijaldUtrrGPPi5+oNeXnEebC37NG+FdqpwdFFFfFnrhRRRQBfuvk0ywTuxkk/AkAf8AoJoo1UeXJbQf88baMfiw3kfm5orWp8Vu36FS3KFFFFZEhRRRQAUUUUAFeg/DzT9kFzfMOWOxD7DrXnwGTgV7No9i2n6Na28Y/eJGC31PJr18rpc9fm/lOXEytC3cs3OWjDKMEHKmq82JrbIH/wBarEL7w0UnDdRVf7pkj9ecV9NLXXucEdDGSYpfRluflINdFazmRR2FczMP9Nh7Zbmt2GUJxXPRk1Jmk1dG3G3FWVfFZcU4PQ1bjfd3r1IzvscriW3ZXiZT3FPspBJbJnkr8p/Cqrg7ciodInPnXFux5B3r9O9Wp2mk+pLj7rPs79lbWDJ4S1qwck/Z7sOv0den5g19E2K7YFFfIn7LV/5ep67ZbjmWOGQD2UsD/wChCvruOQxIo7Yr5TM48uJl5/5Hp4Z3pofOdoJrOgY/abg9OK05MTxgYPI61iuxgN6xOdq15sddDoPkH9pjVvt3xGSyVspYWSIR6M2WP6Fa8YuZvKQAdWOBXS+P9ZOv+O9f1AsWWS7dUz/dU7R+grjLqbzLsovSMc/U195QXsaEYniy9+bZPJ8yADrTN5PGBSK1IXGa0bvqKw059MCmsOuTgGleQZzVeZwCMHg1lJpFpGHLIG1IjdxGv1rVglVwCBz71zWmSme5uJmHLSHj2HA/lXRWyc7jxXJh25K6NZqxoLzjd+Ncf8VLQS6JZ3SjmGfYfow/+tXaW20gs5AHasbx3bi48J6gBzsVXH4MK0xlP2mFqLy/IinLlqRPCKKKK/PD3Aqeyt/td5BBnAkcKT6DPJqCtDTP3K3V0f8AllEQp/2m+UfzNXTSclca3K9/cfar64mxgSSMwHoM8Ciq9FS25O7FuFFFFIAooooAKKKKANHQbT7dq9nARkNICfoOf6V7GJwswVCNw4xXmPgZM64su3cI42OPrxXpjaelwA8UhSXqMjBr6nKab9i5R3uebiWudJjbiWB2yzeTKPUYqnPPFIQyyKJB1561oEOBs1CNXA6OKoXr2sIPl2rSN67eK9ape1zCO9jD1SQQuk3YEGrUNxvVSDkGsjUnkdGyhRPSoPDl2ZrZkY5KOQPpXje1/e8vc63H3bnaWzdDmtKGTGKxrR+KvKxWvWpysjlkrm2uHTFZRb7HqdvKflRm2MfY1btJsjBNVdWhMkJ9eorpqO8FJbozitbM+hP2arz7P8RPs5IC3Fq6/XBB/pX26oBxk8Yr88/gJq/k+P8AwzcseZJxA/1YFf5mv0FRlePrjPFeFmyvVjJdUdeFdotdmXMhQBXE+Otcj8O+GPEGqSMB5Fu5XPdsYA/PFdhOCvevAP2kddW08AXVqj5e9uVjwD2Byf5V52Fp+0qxj3ZvUlyxbPkEzgJLPKfV2P61k2W51aV/vSMWNSatJiCK3U8yYJ+gp0JCIqjsK+0bvO3Y8lK0R+aryMR0NTucE1RuX21M3ZFJXHu/yc1Su5/LiDHgKMmnSs20Y6GsnXL1Y9OlB+8RtFcFapZM6IR1RX0mVJnZydgkYsCPc10SSAgKh4rlNI2xxxo3p0rpYbbz1HlSBce9GHb5UkKolc04rcDmTJqLXIDPoGoxRnIa3bg/TNOhivIcYdZAOxrQQ+dG0cqBN4KmvQcFKDja10c97O5810Vb1O1NjqN1bNwYpWX8jVSvzZpxbTPeTurhWjcn7Lpltb9JJz58nsOiD+Z/EVXsLX7ZdRxMdqdXb0Uck/lSX1z9su5ZgNqscKv91QMAfgAK0j7sG++n+Za0VyvRRRWRIUUUUAFFFFABRRRQB3Pw7h+e9mAywUKK7WWxluPmWdlHsK4zwKiR2c8ryFCZABgegrvEldo90EgmXuucEV9llsYvDRizya7aqNoz3stSQYWcSoO0lQiaeAFbiIoPUNkVektY7rO64uEb+6WxWdcaNKhzHcO6+jHNddSEo6wT+8mMk9JGNrkvmWsjKcYB7VgeEyTJcDtkH8ea1vEimzsHDuCW4ArN8HJua4PoVrwKl3i4p7nYrezbR2du201eDcc1njrxVpG4w1evF20OZl22l2uM1oXC+ZH+FZC8c1rWsgljweuK7abunFmMtNS/8O9UfR/FVnhtvl3Mc0Z9CGGa/TrT50uLeJ0GUYgqfY1+VEzNYXsF3H1icE/TvX6WfCbX18ReC9MvUO7dGgOPYCvIx8b01/df5nTR+J+Z6BKqsuSOnWvkP9q+6jhu9DsYiFVzLcSDPTGB/U19b3D4Q/SvgD9prX21b4lXlrG2Y7OCO3GD2xvb8cuR+FcuWK1bm7I0xGsLdzx4yG7u3mP3eiD0Aq6vy9TzVeBAgzjgVIWLNmvpYXSu92cMtWOL5qtcjKEjmpSc1XcE5z0qZu6sOItuBLEVPUZrj/Frm3+zgDIMgBFdjbfu39jXLeO4MQxv2Vg361wYuP8As7l2NqbtOxNZ/ZniUeYsMg/vitFGt4+ZL1R/uKay7aBZIozIAMgc+voa07e4WHCYWbHbZmrpvul/XzFJdi9BrFtDgLcSyf8AbMmtGLW7JHAuHdc/3oyKrW19bMQskJhY/wAWytRLdZF58udD0yOa9OHO17sk/l/wTmlZPVHivxAgjj8S3MtuQ0U4Eike4rl66/4jzQv4haK3TYIYwrD361zen2gupz5p2QRjfK3oo/qen418Dio3xU4x7s9qjdwiTj/QNMJPFxe8D1WIHr/wI8fQH1rNqxe3RvLl5SNqnhFHRVHAH5VXrmm03ZbI2YUUUVmIKKKKACiiigAooooA9M8DpnRBiNX3SNkHrXSpGFfIt9h9nrmvBSt/YkbIdpEjV1eWlAE6ZI/iHFfcYFJ0Ieh49V++xzPvXCBd/o1ULm8mgBWW3K+681dNuirubefp2qGaY7MKrMPeu6d7auxlG19jzXxZE6mOVpWkWRj97jFaHhKDyrEyHgyMT+FUfGty819DAwCmNSdo9TXR6ba+RaQIvG1BxXzFOCeMm10PQk/3auX1GTViPpUKcGpVNesjnLURGcGpopDA4yeKqg4NWcCRMHrXREzZoXMIuINw5yK+zP2P9Za/8DXtjLJmSwvPL2k87SuR/n2r4httSe3mMMq5jPGc19Vfsa3RTVvFMI+5Its+PceaP61x4ydOrSlyvVbmlJSjJX2Prm9O2NyTwAT+lfmR43vn1Xxrrl5O5dpbyTDH0DED9K/SrXroW2n3UrH5I4WY/gDX5j6qVubl2MaKwdiWUYLc9Sa5ssi3zNeRpXaVkypj34ppI5prHnk00AnNe82chInJpky45FPj6091BX3otdCvqVEPzVkeLI/P08ZGeorZHDHiszXxvsWrmrxvRkjSL99GZ4LuRd6THDervMZKK3qoPFdMsEEZxHI0Qrj/AAwJIhIkfCiQsv4812sbMFHnBGHrirwUuahG61S3Iq6Tdh8flnhpDKPpV2AOfljXYvYmqwXdzGqY+tTI4hRpLh/KjRSzMW4AFegYnknxEspI/EYG3dJPGp+UfePSsC+dbOAWEBBOd1y4/ifsv0Xn8Sfaul8Ya+t1fm8jXbMU8u1B6xx/89D/ALR7eg59K4jr1r8/xjhGtPke7/D/AIP5Hv0k400nuFFFFeeWFFFFABRRRQAUUUoJUgg4I6UAJRWwBFraYG2HU1HTos/+Dfz+tZLo0bskilWU4IIwQa0lDl1WqG1Y9J8EM/8AYo24I8xuD+FdXHsfhwyH61yXgZsaPx2lbj8q7CI7x8mM+hr7TAa0Ieh4tbSbJEjaM5SXI9DTbiXamcZqTY7dOPqKr3rmKI7sMw9K9N3jF20MNGzy3xOBP4kAQcttB+tdRZ3GP3bnDr6965C+m+0eJnf0l/lXYm2W6UPHw9fLYZ81WpJdz0Z6RimW0fnJqdHz0qhCsobZIOR3q+nQV6cbmLJQeatRHiqvXnFWIa2juQyGa0Mj71OPWvqz9jZCLvxRKR90WiA/9/v8K+YAK+tf2QrbyNC1+8258+/SL/viPP8A7UrlxUIwpSkt2aU23NI+g/Gb7PDOsMvB+xTHP/ADX5vTHcT61+jHjSQv4Z1dQOTYzD/xxq/OeQcnNGVfDP5CxPxIpOPmqMMRkVNIKhK5Oa9VowRJGeKeWyOKZEu4ke1ROWjVjg4HWi9kAO5BJArG1y6jS0cO2D2FWjLc3LFYEZR79TVDUtKEcDPctuf0BzXPV5pQdti4tKSuZ+gqZLZW8zy2LHj8a663WMKN5Mh9xXLaGqSW0iE7Sj8YrpIpUgj8zzBtVctuOAKMJZU0/IVXWTLpKgEpGAB1J6CuD8VeJlK7EIaDrHH2mI/iP+wD+ePSpfE/jAeSYoxhHHyxdDJ7t6L7dT9K85uLiW7maW4cvI3UmvKzLMEl7Ok/6/r+rb9uHw/J789xJppLiV5ZmLyOcsx7mo6KK+XbvqztCiiikAUUUUAFFFFABRRRQAA4ORWmt1DqKiPUW8ucDCXOM/g/qPfr9azKKuMnH0GnY9I8EwPb29xaz7Vl3h4zuyHGOoPcV1oKA/OCjeleN6brNxprKF/eQg52EkY9wexr0XRfFMOoIEZxIcdHGHH1Hf6j8hX1OXYui4Kk9Gjz69CTbnDXyOmExXAGWFJcJC8TuynIGSKIjG6DaOD3BzUkhAhIAP419Ctt7nms8ajkF54ieRV2hpSQPQV21sTC4B6GuTiiZPFFyJAAyux4FdjGPMAzXymDi/efW7PSqPb0NFVDrmmYIPSkgYou1u1WCQenWvZ+JHLsxq9OaljODUWCKf0UmmhltTkV9vfsr6dHZ/DqGWUBXurqWU+/IUfoor4StdQSRmUgrg4ya+6/gFpV4mi6EJZWW3ihyIx0OQT/AFrgxtSM6Pus1oxanqer+LoPN0bUUTkNbSKMf7pr847j5ZHB7MRX6U6/DtsLoL1MTfyNfmzq8bwXtxDgbkmdTn1BNPKpWUr+QYlXaKbjIquTtqdSSvPUVFIK9qW1zlQQn5xVlkVgQ3SqcbYYVcY/Ln1qobCe4zzUiXaihR7Vh62xaFq1nGQWbgCuY8Qanb20R82VYwe55J+g6n+XvXPianLTfMaUablL3UVNCuUtZZXduDxsAyWrL8S+LVkYwWiozL6cqp9z/Ef0HvXO32tvMHis1MELcMxOXf6nt9Bx9aya+Vq5hJUvY09u56kaMIy592PlleaRpJmLuxyzMckmmUUV4+5sFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFKrMjBkJVhyCDgikooA6fSPGt7p7KLn/AEiMfxZw4/Hofx/MV32l+LdO1VVHnKkvdG+U/l/+uvGqAcHI4Nethszr4fR+8vMyqUoVfiR2dwp/4SzUJCMDdx9D0rejJQgg8GvP7XW7u12guJ4x0SUbsfQ9R+BFb9p4utmGLqB4T6qdw/xH610UMVSu23a7uZzotpcp1qvkVNG2TWNa63p84/d3UeewY7T+ta0TpKpaJ1cDqynI/OvWpzjP4Xc5pU5R3RZAOKXqMGmrIGHysG+hoBJre5iQQ2Ucdyss8myAMC59Bnmvtv4UfGzwTGkFnFrdrGlrANzSN5eABjvXxHqDxLaSJcEBJPk5ruvhXpOnWvh3xff6fFA93DawhWkHmBAXOTg59BXzOZYqnhJ+zUXazbPWwuGnXg53W6R9meJPj/4H+zzRw+I9PdtpHEwNfGviW5tL3XNSuNMnjubSW5d4pYzlWBOeKW51GGJRJeWmlXOB96Wwj/pisBLuBFmkLQQwlywEaBEXPYAdKvI8xpYis4R7Dx+Ar0Ic0kSgYppXNZN54q0q0LeZdxMR2Vt2fpiuev8A4j2sYIsYZJm7MflH6/4V9PUxmHpfFJHlRw9WXSx174jyzHaB3NVL7xNYaZATczKHHRc8/l1ry/UfF2p6iT+98hD2j6/n1/LArCZmclnJYnuTXjVc4UbqjH7zqjhYr4nc7HWPHtxdkpp6+Wn99x/Jen559sVyM9xLdSmW4kaWQ9WY5NR0V4NbEVcQ71Hc60lFWWiCiiiucYUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFOSR4yDG7KR0IOKKKALg1nUQAPt9yVHQGZiPyzUyeI9UjGEvHH4D/AAoorVVai2k/vB6jZdf1GcATXTSAHIDKCP5VLZ+KdY09JksNQmtVnXZKITsEi+jY6iiik6k5btgtNiudc1Ikn7fcrn+7KV/lVSW4mnYtNLJIx7sxJooqeZ2tcbk3uyOiiipEFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//2Q==';
+let SCOTT_IMG = null;
+(function(){
+  try{
+    if(SCOTT_B64 && SCOTT_B64.length>1000 && SCOTT_B64.indexOf('__')!==0){
+      const im = new Image();
+      im.onload = ()=>{ SCOTT_IMG = im; };
+      im.src = 'data:image/jpeg;base64,'+SCOTT_B64;
+    }
+  }catch(e){}
+})();
 
 /* ---------- bundled display font (Archivo Black, inlined) ---------- */
 let archivoReady = false;
@@ -3546,12 +3802,12 @@ const PLAYLIST = [
  {id:'stat-cap', cat:'stat', dur:10, cfg:{type:'stat',theme:'redfield',anim:'slide',
    fields:{kicker:'REAL MATH',stat:'$18K',label:'commission cap. Then you keep *100%*.',source:'The KW Indy Metro Partners model',cta:'See the model → heykw.com'},
    qr:QR_L('https://heykw.com')}},
- {id:'bold-first-step', cat:'event', dur:12, cfg:{type:'kwevent',theme:'redfield',anim:'slide',
-   fields:{kicker:'FREE · ONE DAY',headline:'First Step to BOLD',tagline:'A changing market requires a change in approach.',dateline:'WED · SEPT 30 · 9 AM – 2 PM · GREENWOOD',sub:'Five free hours of Onward BOLD — mindset reset, lean operations, and conversations that convert.',cta:'Scan to save your free seat'},
+ {id:'bold-schedule', cat:'bold', dur:18, cfg:{type:'bold',theme:'boldpurple',anim:'slide',
+   fields:{variant:'The schedule'},
    qr:QR_L('https://na.eventscloud.com/website/97870/')}},
- {id:'bold-full', cat:'event', dur:12, cfg:{type:'stat',theme:'blackout',anim:'slide',
-   fields:{kicker:'ONWARD BOLD · 6 WEEKS',stat:'10',label:'transactions in 6 weeks — the average *BOLD* student.',source:'Sept 30 – Nov 4 · rewritten by Gary Keller · $799',cta:'One closing pays for it — scan to register'},
-   qr:QR_L('https://na.eventscloud.com/website/97871/')}},
+ {id:'bold-coach', cat:'bold', dur:16, cfg:{type:'bold',theme:'boldpurple',anim:'slide',
+   fields:{variant:'Meet your coach'},
+   qr:QR_L('https://na.eventscloud.com/website/97870/')}},
  {id:'brokers', cat:'team', dur:12, cfg:{type:'team',theme:'graphite',anim:'slide'},
    team:{title:'YOUR BROKER SUPPORT', members:[
     {k:'scott',name:'Scott Smith',role:''},
@@ -3571,20 +3827,26 @@ const PLAYLIST = [
  {id:'wins', cat:'win', dur:10, cfg:{type:'win',theme:'signal',anim:'pop',
    fields:{kicker:'BIG WINS WEEKLY',headline:'Another one *closed*.',sub:"Wins get celebrated loudly around here. It's kind of our thing.",cta:'Come win with us → heykw.com'},
    qr:QR_L('https://heykw.com')}},
- {id:'megacamp', cat:'event', dur:11, cfg:{type:'kwevent',theme:'blackout',anim:'slide',
-   fields:{kicker:'THE BIG STAGE',headline:'Mega Camp 2026',tagline:'Lock In. Level Up.',dateline:'AUG 17–20 · SAN ANTONIO, TX',sub:'Four days of leads, listings, leverage, and wealth — with the entire KW world.',cta:'Roll with us → heykw.com'},
+ {id:'fr27', cat:'event', dur:11, cfg:{type:'kwevent',theme:'blackout',anim:'slide',
+   fields:{kicker:'INDY ROLLS DEEP',headline:'Family Reunion 2027',tagline:"KW's biggest week of the year.",dateline:'FEB 21–24 · HOUSTON, TX',sub:'Thousands of KW agents, one giant mastermind — come with us.',cta:'Roll with us → heykw.com'},
    qr:QR_L('https://events.kw.com')}},
  {id:'leverage', cat:'leverage', dur:10, cfg:{type:'leverage',theme:'linen',anim:'slide',
    fields:{kicker:'THE EASY BUTTON',headline:'Your back office, *handled*.',sub:'Transaction management, listing coordination, and social media — done for you.',cta:'myleveragesolutions.com'},
    qr:QR_L('https://myleveragesolutions.com')}},
  {id:'beliefs', cat:'values', dur:15, cfg:{type:'values',theme:'obsidian',anim:'pulse',
    fields:{kicker:'THE BELIEFS WE HIRE BY'}}},
+ {id:'bold-afford', cat:'bold', dur:20, cfg:{type:'bold',theme:'boldpurple',anim:'slide',
+   fields:{variant:'Afford it?'},
+   qr:QR_L('https://na.eventscloud.com/website/97870/')}},
  {id:'steve', cat:'spotlight', dur:10, headshot:'steve', cfg:{type:'spotlight',theme:'signal',anim:'slide',
    fields:{kicker:'THINKING ABOUT A MOVE?',name:'Steve *Fulford*',detail:'Internal Growth Leader — your first (confidential) conversation',cta:'Say hi → heykw.com'},
    qr:QR_L('https://heykw.com')}},
  {id:'stat-steps', cat:'stat', dur:10, cfg:{type:'stat',theme:'spine',anim:'slide',
    fields:{kicker:'THE ON-RAMP',stat:'3',label:'steps: coffee, game plan, growth.',source:'Keller Williams Indy Metro Partners',cta:'Take step one → heykw.com'},
    qr:QR_L('https://heykw.com')}},
+ {id:'bold-signup', cat:'bold', dur:15, cfg:{type:'bold',theme:'boldpurple',anim:'slide',
+   fields:{variant:'Sign up now'},
+   qr:QR_L('https://na.eventscloud.com/website/97871/')}},
  {id:'hero', cat:'recruiting', dur:11, cfg:{type:'recruiting',theme:'blackout',anim:'slide',align:'center',font:'archivo',
    fields:{kicker:'YOUR MOVE',headline:"You're the *hero* of this story.",sub:"We're the guide — with the training, models, and leverage to prove it.",cta:'Get the map → heykw.com'},
    qr:QR_L('https://heykw.com')}},
@@ -3607,7 +3869,7 @@ if(PARAMS.get('shuffle')==='1'){
   for(let i=ORDER.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ORDER[i],ORDER[j]]=[ORDER[j],ORDER[i]]; }
 }
 const NOQR = PARAMS.get('noqr')==='1';
-const DARK_THEMES = ['obsidian','blackout','redfield'];
+const DARK_THEMES = ['obsidian','blackout','redfield','boldpurple'];
 
 /* ---------- canvases & scheduler ---------- */
 const live = document.getElementById('live');

@@ -170,6 +170,9 @@ a.card:hover h3{color:var(--red)}
   letter-spacing:-.01em;margin:0 0 10px;line-height:1.3}
 .anchor p{margin:0 0 10px;max-width:75ch}
 .anchor p:last-child{margin-bottom:0}
+.hero .h-line{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:1.18rem;
+  color:#fff;margin:18px 0 0;letter-spacing:-.01em}
+.sec-lede{color:var(--muted);margin:-4px 0 16px;max-width:70ch}
 .seed{margin:46px auto;max-width:54ch;text-align:center;color:var(--muted);font-style:italic;
   font-size:1.08rem;line-height:1.75}
 .seed b{color:var(--ink);font-style:normal;font-family:'Libre Franklin',sans-serif;font-weight:700}
