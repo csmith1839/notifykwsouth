@@ -186,6 +186,17 @@ a.card:hover h3{color:var(--red)}
 .path{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .path .card{padding:18px}
 .path h3{font-size:1.06rem}
+.pre .card{padding:15px 16px;gap:6px}
+.pre h3{font-size:1rem}
+.pre .card p{font-size:.88rem}
+.pre .stepnum{width:32px;height:32px;font-size:.95rem}
+.path-label{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:1rem;
+  margin:26px 0 12px;letter-spacing:-.01em}
+.path-label b{color:var(--red)}
+.path-main{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:720px){.path-main{grid-template-columns:1.45fr 1fr}}
+.card.feature{border:2px solid var(--red);box-shadow:var(--shadow-lift)}
+.card.feature h3{font-size:1.3rem}
 .face-sm{width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:top;display:block}
 /* ---- interior page head band ---- */
 .page-head{background:linear-gradient(115deg,var(--sand),#F7F2EA 55%,var(--sand));
