@@ -86,6 +86,17 @@
 
   <p class="seed">And yes — the first month of any business feels like drinking from a firehose. Every founder's does. The feeling is temporary. <b>Owning your ceiling isn't.</b></p>
 
+  <script>
+  /* Launch Pad content links open in new tabs so this page stays up as home base.
+     Top nav and footer still navigate normally. */
+  document.querySelectorAll('main a[href]').forEach(function(a){
+    var h = a.getAttribute('href') || '';
+    if (h.indexOf('tel:') === 0 || h.indexOf('mailto:') === 0) return;
+    a.target = '_blank';
+    a.rel = 'noopener';
+  });
+  </script>
+
 </main>
 <footer>
   <div class="foot-in">
