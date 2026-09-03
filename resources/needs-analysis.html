@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="Agent Needs Analysis — KW Indy Metro Partners office site">
+<title>Agent Needs Analysis | KW Indy Metro Partners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23B40111'/><text x='50' y='68' font-size='52' font-weight='900' font-family='Arial' fill='white' text-anchor='middle'>kw</text></svg>">
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <a class="logo" href="../">
+      <img src="../assets/logo.png" alt="Keller Williams Indy Metro Partners" class="logo-img">
+    </a>
+    <nav><a href="../">Home</a><a href="../launch/index.html">Launch Pad</a><a href="../forms/index.html">Forms</a><a href="../resources/index.html" class="on">Resources</a><a href="../training/index.html">Training</a><a href="../office/index.html">Office</a></nav>
+  </div>
+</header>
+<main>
+<div class="page-head bleed"><div class="ph-in">
+  <p class="crumb"><a href="index.html">← All resources</a></p>
+  <p class="eyebrow">Business tool · Self-administered</p>
+  <h1>Agent Needs Analysis</h1>
+  <p class="lede">Twenty honest statements, three minutes, and you'll know exactly where to focus next — with a prescription built from what this office and KW already offer. Nobody sees your answers unless you choose to share them.</p>
+</div></div>
+
+  <style>
+    .na .q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin:8px 0;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .na .q p{margin:0;font-weight:600;max-width:56ch}
+    .na .opts{display:flex;gap:4px;align-items:center;flex:none}
+    .na .opts span{font-size:.72rem;color:var(--muted);margin:0 6px}
+    .na .opts label{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;cursor:pointer;font-size:.78rem;font-weight:700;color:var(--muted)}
+    .na .opts input{display:none}
+    .na .opts input:checked+label,{}
+    .na .opts label:hover{border-color:var(--red)}
+    .na .opts input:checked ~ i{display:none}
+    .na .opts .on{background:var(--red);border-color:var(--red);color:#fff}
+    .na .actions{margin:22px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .na .res{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--red);border-radius:12px;padding:20px 22px;margin:14px 0;box-shadow:var(--shadow)}
+    .na .res h3{font-family:'Libre Franklin',sans-serif;margin:0 0 4px;font-size:1.15rem}
+    .na .res .rank{font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--red);font-family:'Libre Franklin',sans-serif}
+    .na .office{background:var(--red-soft);border-radius:9px;padding:11px 14px;margin:10px 0;font-size:.95rem}
+    .na .recs{margin:8px 0 0;padding:0;list-style:none}
+    .na .recs li{padding:7px 0;border-top:1px dashed var(--line);font-size:.95rem}
+    .na .tag2{display:inline-block;font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--line);border-radius:99px;padding:2px 9px;margin-left:8px;color:var(--muted);vertical-align:1px}
+    .na #nares{display:none}
+    .na .unfilled{outline:2px solid var(--red);border-radius:10px}
+  </style>
+
+  <div class="na">
+  <p style="max-width:70ch">Rate each statement from <b>1 (not me)</b> to <b>5 (very me)</b>. Gut answers beat careful ones.</p>
+  <div id="naqs"></div>
+  <div class="actions">
+    <button class="btn" id="nago" type="button">Show my prescription</button>
+    <button class="btn ghost" id="nareset" type="button">Start over</button>
+    <span style="color:var(--muted);font-size:.85rem">Answers save on this device only.</span>
+  </div>
+  <div id="nares">
+    <h2>Your prescription</h2>
+    <p style="max-width:70ch">Your three strongest needs, with the office fast lane first and the official KW Prescription behind it. Bring this to your next coaching call — it writes the agenda for you.</p>
+    <div id="nablocks"></div>
+    <div class="actions">
+      <a class="btn" id="namail" href="#">Email my results to coaching</a>
+      <button class="btn ghost" type="button" onclick="window.print()">Print</button>
+    </div>
+    <details style="margin-top:14px">
+      <summary style="cursor:pointer;font-weight:700">How to access anything on this list</summary>
+      <ul class="recs" style="margin-top:8px">
+        <li><span class="tag2">Office</span> Lives on this site or in this building — the link takes you there.</li>
+        <li><span class="tag2">Course</span> KW course — find it in <a href="https://www.kwconnect.com" target="_blank" rel="noopener">KW Connect</a> or Command's learning area; ask Wendy if it's hiding.</li>
+        <li><span class="tag2">Coaching</span> KW MAPS programs — start with <a href="mailto:carla@carlahasthekey.com?subject=Needs%20Analysis%20%E2%80%94%20coaching">Carla</a>; she'll route you to the right MAPS program (<a href="https://www.kwmapscoaching.com" target="_blank" rel="noopener">kwmapscoaching.com</a>).</li>
+        <li><span class="tag2">Book</span> The MREA / SHIFT / MREI library — the office has copies; ask at the front desk before you buy one.</li>
+        <li><span class="tag2">Tech</span> Command and its tools — our <a href="index.html">SOP library</a> covers the office-critical pieces click by click.</li>
+        <li><span class="tag2">Event</span> KW events — <a href="https://events.kw.com" target="_blank" rel="noopener">events.kw.com</a>, plus our own <a href="../training/index.html">training calendar</a>.</li>
+        <li><span class="tag2">Ask</span> Leadership plugs you in personally — grab Libby, Jessica, or Wendy, or raise it on a <a href="../training/index.html#momentum">Momentum Monday</a>.</li>
+      </ul>
+    </details>
+  </div>
+  </div>
+
+  <script>
+  (function(){
+    var AREAS = {
+      biz:    {t:"Skills to Build a Business vs Being an Agent",
+               office:'Run the <a href="tools/economic-model.html">MREA Economic Model</a> (Simple, then Advanced) and bring the numbers to a <a href="mailto:carla@carlahasthekey.com?subject=Needs%20Analysis">coaching call</a> — that pair turns "agent" into "business owner" faster than anything on this list.',
+               recs:[["MREA: The Four Models Overview","Book",null],["MREA: The 7th Level Model","Book",null],["Win with Buyers/Win with Sellers (+ Scripts)","Course",null],["SHIFT Tactic 2: Expense Management","Book",null],["SHIFT Tactic 3: Effective People Leverage","Book",null],["KW MAPS Assistants Program","Coaching",null],["Command","Tech","command-opportunity-phases.html"],["KW MAPS One-on-One Coaching","Coaching",null]]},
+      sales:  {t:"Sales Skills",
+               office:'<a href="../launch/required-training.html">Breakthrough 120</a> (or <a href="https://doubledutybydesign.com/ignite-after-dark" target="_blank" rel="noopener">Ignite After Dark</a> evenings) plus Tue–Fri dialogue practice — scripts only get comfortable out loud.',
+               recs:[["Ignite (ours: Breakthrough 120 / Ignite After Dark)","Office","../launch/required-training.html"],["BOLD","Coaching",null],["Lead Generation 36:12:3","Course",null],["MREA: Buyer, Seller, Lead Generation Scripts","Book",null],["SHIFT Tactic 7: Seller Pricing Strategies","Book",null],["SHIFT Tactic 9: Creating Urgency to Buy","Book",null],["KW MAPS One-on-One and Group Coaching","Coaching",null]]},
+      balance:{t:"Life Balance",
+               office:'This is the Double Duty specialty — a <a href="mailto:carla@carlahasthekey.com?subject=Needs%20Analysis%20%E2%80%94%20life%20balance">coaching call with Carla</a> builds a business around your actual life, not someone else\'s schedule.',
+               recs:[["Career Visioning","Course",null],["SHIFT Tactic 3: Effective People Leverage","Book",null],["Leverage for Command","Course",null],["Quantum Leap","Course",null],["Consultation: TL or Mastermind Group","Ask","../office/index.html"],["KW MAPS Performance or Life Coaching","Coaching",null]]},
+      tech:   {t:"Technology",
+               office:'Start with our <a href="index.html">Command, piece by piece</a> SOPs — contacts, logging, commissions, phases — then claim your free <a href="canva-gemini.html">Canva Pro &amp; Gemini</a>.',
+               recs:[["Command","Tech","kw-apps.html"],["Labs","Tech",null],["Kelle","Tech",null]]},
+      leadgen:{t:"Lead Generation",
+               office:'<a href="../training/index.html#momentum">Momentum Monday</a> is a lead-gen session with coaching in the room — and the <a href="../launch/five-week-plan.html">Launch Plan\'s</a> conversation habit is the engine. Both free, both weekly.',
+               recs:[["Ignite (ours: Breakthrough 120 / Ignite After Dark)","Office","../launch/required-training.html"],["BOLD","Coaching",null],["Lead Generation 36:12:3","Course",null],["MREA: Lead Generation Model","Book",null],["SHIFT Tactic 4: Upshifting Your Lead Generation","Book",null],["SHIFT Tactic 5: Lead Capture and Conversion","Book",null],["Command","Tech","command-contact-import.html"],["KW MAPS Group and One-on-One Coaching","Coaching",null]]},
+      wealth: {t:"Exit Strategy (Wealth Building)",
+               office:'Ask Chad (MCA) about the Profit Share Program — five minutes to understand it, a career to benefit from it. <a href="mailto:csmith@kw.com?subject=Profit%20Share%20question">csmith@kw.com</a>.',
+               recs:[["Profit Share Program","Ask",null],["Grow Your Profit Share Tree &amp; Wealth Building Workshop","Event",null],["The Millionaire Real Estate Investor","Book",null],["HOLD","Book",null],["MREA: The 7th Level Model","Book",null]]},
+      teach:  {t:"Opportunity to Teach",
+               office:'Tell Wendy Rhodes you want to teach — instructors for office classes come from exactly this conversation. <a href="mailto:wrhodes@kw.com?subject=I%20want%20to%20teach">wrhodes@kw.com</a>.',
+               recs:[["Leverage Instructor","Ask",null],["Train the Presenter","Course",null],["ALC Education Committee","Ask",null]]},
+      lead:   {t:"Leadership Skills",
+               office:'Grab Libby or Jessica after a <a href="../training/index.html#momentum">Momentum Monday</a> and say you\'re interested in leadership — the ALC and committees run on people who raise their hand.',
+               recs:[["ALC Clinic","Ask",null],["Leadership Unlocked","Course",null],["Leverage Series","Course",null],["KW MAPS One-on-One Coaching","Coaching",null]]},
+      time:   {t:"Time Management / Focus (The ONE Thing)",
+               office:'<a href="../training/index.html#momentum">Momentum Monday</a> exists for this — you leave with the week\'s priorities set. Pair it with a 4-1-1 from your coach.',
+               recs:[["Time Management with the 4-1-1","Coaching",null],["MREA: Time Blocking","Book",null],["The Six Personal Perspectives","Course",null],["Team Meeting: come to ours","Office","../training/index.html"],["KW MAPS One-on-One Coaching","Coaching",null]]},
+      culture:{t:"Culture &amp; Connection",
+               office:'Pick one thing on the <a href="../training/index.html">training calendar</a> this month and show up — and join the <a href="https://www.facebook.com/groups/549545638461500" target="_blank" rel="noopener">office Facebook group</a> today.',
+               recs:[["Your Training Calendar: come to an event","Office","../training/index.html"],["Family Reunion","Event",null],["Family Reunion: Inspirational Brunch","Event",null],["Mega Camp","Event",null],["KW Cares","Event",null],["RED Day","Event",null],["KW MAPS One-on-One Coaching","Coaching",null]]}
+    };
+    var QS = [
+      ["biz","I sell houses, but I couldn't show you the business behind it — no models, no numbers I track."],
+      ["biz","If I stopped working tomorrow, my income would stop with me."],
+      ["sales","I avoid or wing the hard conversations — pricing, objections, urgency."],
+      ["sales","I don't have scripts I actually trust coming out of my mouth."],
+      ["balance","Real estate is bleeding into every evening, weekend, and vacation."],
+      ["balance","The people I love are getting my leftovers."],
+      ["tech","Command feels like a tool I own but don't drive."],
+      ["tech","I suspect KW has tech for my problem — I just don't know where it is."],
+      ["leadgen","My pipeline depends on luck and referrals showing up on their own."],
+      ["leadgen","I don't have a daily lead-generation habit I actually keep."],
+      ["wealth","Every commission gets spent; nothing is building toward the day I stop selling."],
+      ["wealth","I couldn't explain profit share, HOLD, or how agents here build wealth."],
+      ["teach","I light up when I get to explain or teach something to other agents."],
+      ["teach","People tell me I should be the one teaching this stuff."],
+      ["lead","I want a bigger seat — committees, leadership, real influence in this office."],
+      ["lead","I'm curious what growth KW offers beyond selling more houses."],
+      ["time","My days happen to me — busy weeks end with nothing that mattered done."],
+      ["time","I don't time-block, and my ONE thing changes hourly."],
+      ["culture","I work here, but I don't feel plugged into the people yet."],
+      ["culture","I've never been to an office event, Family Reunion, or a give-back day."]
+    ];
+    var KEY='kw-na-v1', state={};
+    try{ state=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ state={}; }
+    var wrap=document.getElementById('naqs');
+    QS.forEach(function(q,i){
+      var row=document.createElement('div'); row.className='q'; row.id='naq'+i;
+      var html='<p>'+q[1]+'</p><div class="opts"><span>not me</span>';
+      for(var v=1;v<=5;v++){ html+='<label data-i="'+i+'" data-v="'+v+'" class="'+(state[i]==v?'on':'')+'">'+v+'</label>'; }
+      html+='<span>very me</span></div>';
+      row.innerHTML=html; wrap.appendChild(row);
+    });
+    wrap.addEventListener('click',function(e){
+      var l=e.target.closest('label'); if(!l) return;
+      var i=l.getAttribute('data-i'), v=l.getAttribute('data-v');
+      state[i]=+v; try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(err){}
+      var row=document.getElementById('naq'+i); row.classList.remove('unfilled');
+      row.querySelectorAll('label').forEach(function(x){ x.classList.toggle('on', x===l); });
+    });
+    document.getElementById('nareset').addEventListener('click',function(){
+      state={}; try{ localStorage.removeItem(KEY); }catch(e){}
+      document.querySelectorAll('.na .q label').forEach(function(x){ x.classList.remove('on'); });
+      document.getElementById('nares').style.display='none';
+    });
+    document.getElementById('nago').addEventListener('click',function(){
+      var missing=[];
+      QS.forEach(function(q,i){ if(!state[i]) missing.push(i); });
+      if(missing.length){ missing.forEach(function(i){ document.getElementById('naq'+i).classList.add('unfilled'); });
+        document.getElementById('naq'+missing[0]).scrollIntoView({block:'center'}); return; }
+      var scores={};
+      QS.forEach(function(q,i){ scores[q[0]]=(scores[q[0]]||0)+state[i]; });
+      var top=Object.keys(scores).sort(function(a,b){ return scores[b]-scores[a]; }).slice(0,3);
+      var out='';
+      top.forEach(function(k,idx){
+        var a=AREAS[k];
+        out+='<div class="res"><p class="rank">Need '+(idx+1)+' · score '+scores[k]+'/10</p><h3>'+a.t+'</h3>'
+           +'<div class="office"><b>Office fast lane:</b> '+a.office+'</div>'
+           +'<p style="margin:10px 0 0;font-weight:700;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">The KW Prescription</p><ul class="recs">';
+        a.recs.forEach(function(r){
+          var name = r[2] ? '<a href="'+r[2]+'">'+r[0]+'</a>' : r[0];
+          out+='<li>'+name+'<span class="tag2">'+r[1]+'</span></li>';
+        });
+        out+='</ul></div>';
+      });
+      document.getElementById('nablocks').innerHTML=out;
+      var names=top.map(function(k,i){ return (i+1)+'. '+AREAS[k].t.replace(/&amp;/g,'&')+' ('+scores[k]+'/10)'; }).join('%0D%0A');
+      document.getElementById('namail').href='mailto:carla@carlahasthekey.com?cc=csmith@kw.com&subject=My%20Needs%20Analysis%20results&body=My%20top%20needs%20from%20the%20office%20Needs%20Analysis%3A%0D%0A'+names+'%0D%0A%0D%0ACan%20we%20talk%20through%20the%20prescription%3F';
+      document.getElementById('nares').style.display='block';
+      document.getElementById('nares').scrollIntoView({block:'start'});
+    });
+  })();
+  </script>
+  <p style="color:var(--muted);font-size:.88rem;margin-top:26px"><em>Modeled on the KW Prescription framework. Retake it every quarter — the honest answer changes as the business grows.</em></p>
+
+
+  <div class="next"><p class="nx-label">Where to next</p><a href="../launch/index.html">The Launch Pad <span class="why">— if you're new, start there</span></a><a href="tools/economic-model.html">MREA Economic Model <span class="why">— put numbers on the goal</span></a></div>
+</main>
+<footer>
+  <div class="foot-in">
+    <div>
+      <img src="../assets/logo-white.png" alt="Keller Williams Indy Metro Partners" class="foot-logo">
+      <p style="margin:0">48 N Emerson Ave, Suite 300, Greenwood, IN 46143<br>
+      Front desk: <a href="tel:3178825900">(317) 882-5900</a></p>
+      <p class="foot-note">Office text alerts: text <b style="color:#fff">ENROLL</b> to (844) 538-1578</p>
+    </div>
+    <div>
+      <p class="fh">Go to</p>
+      <a class="fl" href="../launch/index.html">Launch Pad</a>
+      <a class="fl" href="../forms/index.html">Forms</a>
+      <a class="fl" href="../resources/index.html">Resources</a>
+      <a class="fl" href="../training/index.html">Training</a>
+      <a class="fl" href="../office/index.html">Office &amp; team</a>
+    </div>
+    <div>
+      <p class="fh">Stuck mid-deal?</p>
+      <a class="foot-hot-num" href="tel:3176611607">317-661-1607</a>
+      <p class="foot-note">The Broker Hotline — real brokers, real answers, any hour you're writing an offer. There are no dumb questions.</p>
+    </div>
+  </div>
+  <div class="foot-base"><div class="fb-in">KW Indy Metro Partners · Keller Williams Realty · Built and kept current by your MCA team — spot something stale? <a href="mailto:csmith@kw.com">Tell Chad</a>.</div></div>
+</footer>
+</body>
+</html>
