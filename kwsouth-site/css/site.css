@@ -1,0 +1,109 @@
+/* KW Indy Metro South — site styles */
+:root{
+  --red:#B40111; --red-ink:#8E020F; --red-soft:#F6ECEC;
+  --ink:#17161A; --paper:#F7F5F4; --surface:#FFFFFF;
+  --muted:#6E676B; --line:#E5E0DF; --dash:#C9C2C1; --ok:#4E6E52;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Source Sans 3','Segoe UI',system-ui,sans-serif;font-size:1.02rem;line-height:1.55}
+header{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.head-in{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:9px;padding:14px 0;text-decoration:none;color:var(--ink)}
+.logo .kw{font-family:'Libre Franklin',sans-serif;font-weight:900;font-size:1.5rem;letter-spacing:-.04em;color:var(--red);line-height:1}
+.logo .office{font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.1em}
+nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+nav a{font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:.9rem;color:var(--muted);
+  padding:20px 14px 17px;border-bottom:3px solid transparent;text-decoration:none}
+nav a:hover{color:var(--ink)}
+nav a:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+nav a.on{color:var(--ink);border-bottom-color:var(--red)}
+main{max-width:1080px;margin:0 auto;padding:36px 20px 64px}
+.eyebrow{font-family:'Libre Franklin',sans-serif;text-transform:uppercase;letter-spacing:.14em;
+  font-size:.7rem;font-weight:700;color:var(--red);margin:0 0 8px}
+h1{font-family:'Libre Franklin',sans-serif;font-weight:900;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.1;margin:0 0 10px;text-wrap:balance}
+.lede{color:var(--muted);font-size:1.1rem;max-width:60ch;margin:0 0 30px}
+h2{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:1.15rem;margin:36px 0 14px;letter-spacing:-.01em}
+p{max-width:68ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;
+  display:flex;flex-direction:column;gap:8px}
+a.card{text-decoration:none;color:var(--ink)}
+a.card:hover{border-color:var(--red)}
+a.card:hover h3{color:var(--red)}
+.card h3{font-family:'Libre Franklin',sans-serif;font-weight:800;font-size:1.05rem;margin:0;letter-spacing:-.01em}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+.card .meta{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:auto}
+.btn{display:inline-block;align-self:flex-start;background:var(--red);color:#fff;
+  font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:.85rem;
+  padding:9px 16px;border-radius:8px;text-decoration:none;border:none;cursor:pointer}
+.btn:hover{background:var(--red-ink)}
+.btn.ghost{background:none;color:var(--red);border:1.5px solid var(--red)}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.quick a{background:var(--surface);border:1px solid var(--line);border-radius:99px;
+  padding:7px 15px;font-size:.88rem;font-weight:600;color:var(--ink);text-decoration:none}
+.quick a:hover{border-color:var(--red);color:var(--red)}
+.hotline{background:var(--red-soft);border-radius:12px;padding:18px 20px;margin-top:34px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hotline .label{font-family:'Libre Franklin',sans-serif;font-weight:800;text-transform:uppercase;
+  font-size:.75rem;letter-spacing:.12em;color:var(--red-ink)}
+.hotline a{font-family:'Libre Franklin',sans-serif;font-weight:900;font-size:1.4rem;color:var(--ink);
+  text-decoration:none;letter-spacing:-.01em}
+.hotline .why{color:var(--muted);font-size:.9rem}
+.embed-slot{border:2px dashed var(--dash);border-radius:10px;padding:28px 22px;text-align:center;
+  color:var(--muted);font-size:.92rem;background:var(--surface)}
+.embed-slot b{font-family:'Libre Franklin',sans-serif;display:block;margin-bottom:4px;color:var(--ink)}
+.slot-fields{font-size:.8rem;display:block;margin-top:6px}
+.embed-frame iframe{width:100%;border:none;border-radius:10px;background:var(--surface)}
+.embed-frame.video{position:relative;padding-top:56.25%;border-radius:10px;overflow:hidden}
+.embed-frame.video iframe{position:absolute;inset:0;width:100%;height:100%}
+.steps{counter-reset:s;margin:0;padding:0;list-style:none;max-width:68ch}
+.steps li{counter-increment:s;display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(s);font-family:'Libre Franklin',sans-serif;font-weight:800;
+  color:var(--red);min-width:1.4em;text-align:right}
+.callout{background:var(--red-soft);border-radius:10px;padding:14px 18px;max-width:66ch;font-size:.98rem}
+.callout b{font-family:'Libre Franklin',sans-serif}
+.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.person{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.person .name{font-family:'Libre Franklin',sans-serif;font-weight:800;margin:0}
+.person .role{color:var(--red);font-size:.78rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.09em;margin:2px 0 8px;font-family:'Libre Franklin',sans-serif}
+.person a{display:block;color:var(--ink);text-decoration:none;font-size:.93rem;padding:2px 0}
+.person a:hover{color:var(--red)}
+.form-intro{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:18px 20px;margin:0 0 18px;max-width:none}
+.form-intro dl{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:10px 0 0;font-size:.93rem}
+.form-intro dt{font-weight:700;font-family:'Libre Franklin',sans-serif;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--muted);align-self:baseline}
+.form-intro dd{margin:0}
+.crumb{font-size:.85rem;margin:0 0 18px}
+.crumb a{color:var(--muted);text-decoration:none}
+.crumb a:hover{color:var(--red)}
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px;max-width:640px}
+.calc label{display:block;font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:.85rem;margin:14px 0 4px}
+.calc label:first-child{margin-top:0}
+.calc input[type=number]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+  font-size:1.05rem;font-family:inherit;background:var(--paper);color:var(--ink)}
+.calc input:focus-visible{outline:2px solid var(--red)}
+.calc .out{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:18px}
+.calc .bucket{background:var(--paper);border-radius:10px;padding:14px;text-align:center}
+.calc .bucket .amt{font-family:'Libre Franklin',sans-serif;font-weight:900;font-size:1.3rem;
+  font-variant-numeric:tabular-nums}
+.calc .bucket .lbl{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+  font-family:'Libre Franklin',sans-serif;font-weight:700}
+.calc .bucket.hero{background:var(--red-soft)}
+.calc .note{font-size:.85rem;color:var(--muted);margin-top:14px}
+footer{border-top:1px solid var(--line);background:var(--surface)}
+.foot-in{max-width:1080px;margin:0 auto;padding:26px 20px;display:flex;gap:20px;flex-wrap:wrap;
+  align-items:center;justify-content:space-between;font-size:.88rem;color:var(--muted)}
+.foot-in b{color:var(--ink);font-family:'Libre Franklin',sans-serif}
+.foot-in a{color:var(--red);text-decoration:none;font-weight:700}
+.tag{font-size:.68rem;font-weight:700;font-family:'Libre Franklin',sans-serif;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ok)}
+@media (max-width:720px){
+  nav{width:100%;justify-content:space-between}
+  nav a{padding:12px 8px 10px}
+  .form-intro dl{grid-template-columns:1fr}
+}

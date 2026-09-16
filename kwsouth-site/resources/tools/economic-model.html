@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="Economic Model — KW Indy Metro South office site">
+<title>Economic Model | KW Indy Metro South</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23B40111'/><text x='50' y='68' font-size='52' font-weight='900' font-family='Arial' fill='white' text-anchor='middle'>kw</text></svg>">
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <a class="logo" href="../../index.html">
+      <span class="kw">kw</span><span class="office">Indy Metro South</span>
+    </a>
+    <nav><a href="../../index.html">Home</a><a href="../../launch/index.html">Launch Pad</a><a href="../../forms/index.html">Forms</a><a href="../../resources/index.html" class="on">Resources</a><a href="../../training/index.html">Training</a><a href="../../office/index.html">Office</a></nav>
+  </div>
+</header>
+<main>
+  <p class="crumb"><a href="../index.html">← All resources</a></p>
+  <p class="eyebrow">Business tool</p>
+  <h1>Economic Model</h1>
+  <p class="lede">The KW economic model runs backwards: start from the income you want, end at the appointments it takes to earn it.</p>
+  <div class="calc">
+    <label for="gci">Annual GCI goal ($)</label>
+    <input type="number" id="gci" value="120000" min="0" step="5000" inputmode="decimal">
+    <label for="price">Average sale price in your market ($)</label>
+    <input type="number" id="price" value="300000" min="0" step="10000" inputmode="decimal">
+    <label for="rate">Average commission per side (%)</label>
+    <input type="number" id="rate" value="2.75" min="0" max="10" step="0.05" inputmode="decimal">
+    <label for="conv">Appointments that become closings (%)</label>
+    <input type="number" id="conv" value="50" min="1" max="100" step="5" inputmode="decimal">
+    <div class="out">
+      <div class="bucket"><div class="amt" id="e-close">—</div><div class="lbl">Closings / yr</div></div>
+      <div class="bucket"><div class="amt" id="e-appt">—</div><div class="lbl">Appointments / yr</div></div>
+      <div class="bucket hero"><div class="amt" id="e-week">—</div><div class="lbl">Appointments / wk</div></div>
+    </div>
+    <p class="note">That weekly number is the one to put on your wall — everything upstream of it (contacts, conversations, lead gen hours) exists to produce it. Talk to your Productivity Coach about the contacts-per-appointment ratio for your lead sources.</p>
+  </div>
+  <script>
+    const ids = ['gci','price','rate','conv'];
+    function calc(){
+      const [gci, price, rate, conv] = ids.map(i => Math.max(0, parseFloat(document.getElementById(i).value) || 0));
+      if (!gci || !price || !rate || !conv) return;
+      const perDeal = price * rate / 100;
+      const closings = gci / perDeal;
+      const appts = closings / (conv / 100);
+      document.getElementById('e-close').textContent = Math.ceil(closings);
+      document.getElementById('e-appt').textContent = Math.ceil(appts);
+      document.getElementById('e-week').textContent = (appts / 50).toFixed(1);
+    }
+    ids.forEach(i => document.getElementById(i).addEventListener('input', calc));
+    calc();
+  </script>
+
+</main>
+<footer>
+  <div class="foot-in">
+    <div>
+      <b>KW Indy Metro South</b> · Keller Williams Realty<br>
+      48 N Emerson Ave, Suite 300, Greenwood, IN 46143 · <a href="tel:3178825900">(317) 882-5900</a>
+    </div>
+    <div class="foot-hot">Broker Hotline: <a href="tel:3176611607">317-661-1607</a></div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="30/30/40 Calculator — KW Indy Metro South office site">
+<title>30/30/40 Calculator | KW Indy Metro South</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23B40111'/><text x='50' y='68' font-size='52' font-weight='900' font-family='Arial' fill='white' text-anchor='middle'>kw</text></svg>">
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <a class="logo" href="../../index.html">
+      <span class="kw">kw</span><span class="office">Indy Metro South</span>
+    </a>
+    <nav><a href="../../index.html">Home</a><a href="../../launch/index.html">Launch Pad</a><a href="../../forms/index.html">Forms</a><a href="../../resources/index.html" class="on">Resources</a><a href="../../training/index.html">Training</a><a href="../../office/index.html">Office</a></nav>
+  </div>
+</header>
+<main>
+  <p class="crumb"><a href="../index.html">← All resources</a></p>
+  <p class="eyebrow">Business tool</p>
+  <h1>30 / 30 / 40 Calculator</h1>
+  <p class="lede">Split every commission check with intention: 30% to taxes, 30% back into the business, 40% to you.</p>
+  <div class="calc">
+    <label for="check">Commission check amount</label>
+    <input type="number" id="check" min="0" step="100" placeholder="e.g. 8500" inputmode="decimal">
+    <div class="out">
+      <div class="bucket"><div class="amt" id="o-tax">$0</div><div class="lbl">30% Taxes</div></div>
+      <div class="bucket"><div class="amt" id="o-biz">$0</div><div class="lbl">30% Business</div></div>
+      <div class="bucket hero"><div class="amt" id="o-you">$0</div><div class="lbl">40% You</div></div>
+    </div>
+    <p class="note">Set the tax slice aside the day the check lands — future-you at tax time says thanks. This is a planning tool, not tax advice; your CPA has the final word on your actual rate.</p>
+  </div>
+  <script>
+    const inp = document.getElementById('check');
+    const fmt = n => '$' + n.toLocaleString('en-US', {maximumFractionDigits: 0});
+    inp.addEventListener('input', () => {
+      const v = Math.max(0, parseFloat(inp.value) || 0);
+      document.getElementById('o-tax').textContent = fmt(v * .3);
+      document.getElementById('o-biz').textContent = fmt(v * .3);
+      document.getElementById('o-you').textContent = fmt(v * .4);
+    });
+  </script>
+
+</main>
+<footer>
+  <div class="foot-in">
+    <div>
+      <b>KW Indy Metro South</b> · Keller Williams Realty<br>
+      48 N Emerson Ave, Suite 300, Greenwood, IN 46143 · <a href="tel:3178825900">(317) 882-5900</a>
+    </div>
+    <div class="foot-hot">Broker Hotline: <a href="tel:3176611607">317-661-1607</a></div>
+  </div>
+</footer>
+</body>
+</html>
