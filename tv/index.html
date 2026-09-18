@@ -3920,7 +3920,38 @@ function crossfadeFromCurrent(){
   }catch(e){}
 }
 
+/* ---------- self-update: screens pointed at the hosted URL pick up new versions
+   automatically. Checks the server every 30 min (cache-bypassing); when the file
+   changed, reloads at the END of a full loop cycle so viewers never see an
+   interruption. Does nothing when opened from a local file. ---------- */
+const BUILD_ID = '2026-09-18T14:23:18Z-v1.3';
+let updatePending = false;
+function checkForUpdate(){
+  try{
+    if(!/^https?:$/.test(location.protocol)) return;
+    fetch(location.pathname + '?u=' + Date.now(), {cache:'no-store'})
+      .then(r => r.ok ? r.text() : null)
+      .then(txt => {
+        if(!txt) return;
+        const m = txt.match(/BUILD_ID = '([^']+)'/);
+        if(m && m[1] !== BUILD_ID && m[1].indexOf('__') !== 0) updatePending = true;
+      })
+      .catch(()=>{});
+  }catch(e){}
+}
+setTimeout(checkForUpdate, 90*1000);
+setInterval(checkForUpdate, 30*60*1000);
+setTimeout(()=>{ try{ if(window.__lobby){
+  window.__lobby.checkNow = checkForUpdate;
+  window.__lobby.updatePending = ()=>updatePending;
+  window.__lobby.cycleEnd = ()=>{ paused = false; goTo(ORDER.length, true); };
+  window.__lobby.build = BUILD_ID;
+} }catch(e){} }, 50);
+
 function goTo(i, fade){
+  if(updatePending && !paused && ((i % ORDER.length) + ORDER.length) % ORDER.length === 0 && i !== cur){
+    try{ location.reload(); return; }catch(e){}
+  }
   if(fade!==false) crossfadeFromCurrent();
   cur = ((i % ORDER.length) + ORDER.length) % ORDER.length;
   tn = 0; lastTs = null;
