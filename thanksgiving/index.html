@@ -27,7 +27,7 @@ const cx = cv.getContext('2d');
 const KW = '#B40111';
 
 let W=0, H=0, minD=0, DPR=1;
-let hills=null, sceneCv=null, windows=[], chimneys=[], signs=[];
+let hills=null, farCv=null, nearCv=null, windows=[], chimneys=[], signs=[], owlPos=null, crowPos=null;
 
 function resize(){
   DPR = Math.min(window.devicePixelRatio||1, 1.5);
@@ -41,6 +41,7 @@ addEventListener('resize', resize);
 function lerp(a,b,t){ return a+(b-a)*t; }
 function mix(c1,c2,t){ return [lerp(c1[0],c2[0],t),lerp(c1[1],c2[1],t),lerp(c1[2],c2[2],t)]; }
 function rgb(c){ return 'rgb('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+')'; }
+function ease(t){ return t<0.5 ? 2*t*t : 1-2*(1-t)*(1-t); }
 
 /* ---------------- sky + stars ---------------- */
 const SKY_A = { top:[34,13,40], mid:[106,30,34], low:[214,126,52] };
@@ -91,8 +92,14 @@ function buildHills(){
     {pts:hillPath(H*0.90, minD*0.020, 7.9), col:'#260d14'},
   ];
 }
+function fillHill(c2,hl){
+  c2.fillStyle=hl.col;
+  c2.beginPath(); c2.moveTo(0,H);
+  hl.pts.forEach(p=>c2.lineTo(p[0],p[1]));
+  c2.lineTo(W,H); c2.closePath(); c2.fill();
+}
 
-/* ---------------- static scene: hills + trees + neighborhood (offscreen) ---------------- */
+/* ---------------- scenery pieces ---------------- */
 function branch(c2,x,y,len,ang,w,depth){
   if(depth===0 || len<2) return;
   const x2=x+Math.cos(ang)*len, y2=y+Math.sin(ang)*len;
@@ -102,7 +109,6 @@ function branch(c2,x,y,len,ang,w,depth){
   branch(c2,x2,y2,len*0.70,ang+0.42+Math.cos(depth*1.7)*0.12,w*0.65,depth-1);
 }
 function house(c2,x,y,s,roof){
-  /* silhouette house, base anchored at (x,y); registers windows/chimney/possible sign */
   const w=s*1.5, h=s;
   c2.fillStyle='#180a0e';
   c2.fillRect(x-w/2, y-h, w, h);
@@ -110,45 +116,86 @@ function house(c2,x,y,s,roof){
   if(roof===0){ c2.moveTo(x-w/2-s*0.14, y-h); c2.lineTo(x, y-h-s*0.72); c2.lineTo(x+w/2+s*0.14, y-h); }
   else { c2.moveTo(x-w/2-s*0.12, y-h); c2.lineTo(x-w*0.1, y-h-s*0.6); c2.lineTo(x+w/2+s*0.12, y-h-s*0.18); }
   c2.closePath(); c2.fill();
-  /* chimney */
   const chx=x+w*0.26, chTop=y-h-s*0.78;
   c2.fillRect(chx-s*0.09, chTop, s*0.18, s*0.5);
   chimneys.push({x:chx, y:chTop});
-  /* windows (lit later, every frame) */
   const rows=[[x-w*0.3,y-h*0.62],[x+w*0.08,y-h*0.62],[x-w*0.3,y-h*0.24],[x+w*0.08,y-h*0.24]];
   for(let i=0;i<rows.length;i++){
     if(Math.random()<0.78) windows.push({x:rows[i][0], y:rows[i][1], w:s*0.22, h:s*0.26, ph:Math.random()*7});
   }
 }
-function yardSign(list,x,y,s){ list.push({x,y,s}); }
+function pumpkin(c2,x,y,s,col){
+  c2.fillStyle=col;
+  c2.beginPath(); c2.ellipse(x,y,s,s*0.78,0,0,7); c2.fill();
+  c2.strokeStyle='rgba(0,0,0,0.3)'; c2.lineWidth=Math.max(1,s*0.08);
+  for(const k of [-0.5,0,0.5]){
+    c2.beginPath(); c2.ellipse(x+k*s*0.5,y,s*(0.55-Math.abs(k)*0.2),s*0.76,0,0,7); c2.stroke();
+  }
+  c2.strokeStyle='#3f2a12'; c2.lineWidth=Math.max(2,s*0.14); c2.lineCap='round';
+  c2.beginPath(); c2.moveTo(x,y-s*0.72); c2.quadraticCurveTo(x+s*0.15,y-s*1.05,x+s*0.35,y-s*1.0); c2.stroke();
+}
+function hayBale(c2,x,y,s){
+  c2.fillStyle='#8f6a2c';
+  c2.beginPath(); c2.ellipse(x-s*0.8,y-s*0.5,s*0.34,s*0.5,0,0,7); c2.fill();
+  c2.fillStyle='#a87f36';
+  c2.fillRect(x-s*0.8,y-s,s*1.6,s);
+  c2.beginPath(); c2.ellipse(x+s*0.8,y-s*0.5,s*0.34,s*0.5,0,0,7); c2.fill();
+  c2.strokeStyle='rgba(60,40,10,0.5)'; c2.lineWidth=Math.max(1,s*0.05);
+  c2.beginPath(); c2.moveTo(x-s*0.35,y-s); c2.lineTo(x-s*0.35,y); c2.stroke();
+  c2.beginPath(); c2.moveTo(x+s*0.25,y-s); c2.lineTo(x+s*0.25,y); c2.stroke();
+}
+function scarecrowBody(c2,x,y,s){
+  c2.strokeStyle='#241009'; c2.lineWidth=Math.max(2,s*0.1); c2.lineCap='round';
+  c2.beginPath(); c2.moveTo(x,y); c2.lineTo(x,y-s*1.9); c2.stroke();
+  c2.beginPath(); c2.moveTo(x-s*0.75,y-s*1.35); c2.lineTo(x+s*0.75,y-s*1.35); c2.stroke();
+  c2.fillStyle='#3c1f10';
+  c2.beginPath();
+  c2.moveTo(x-s*0.45,y-s*1.42); c2.lineTo(x+s*0.45,y-s*1.42);
+  c2.lineTo(x+s*0.3,y-s*0.35); c2.lineTo(x-s*0.3,y-s*0.35); c2.closePath(); c2.fill();
+  c2.fillStyle='#c9a36a';
+  c2.beginPath(); c2.arc(x,y-s*1.68,s*0.26,0,7); c2.fill();
+  c2.fillStyle='#241009';
+  c2.fillRect(x-s*0.38,y-s*1.88,s*0.76,s*0.1);
+  c2.beginPath(); c2.moveTo(x-s*0.26,y-s*1.88); c2.lineTo(x,y-s*2.2); c2.lineTo(x+s*0.26,y-s*1.88); c2.closePath(); c2.fill();
+}
 function buildScene(){
   windows=[]; chimneys=[]; signs=[];
-  sceneCv = document.createElement('canvas');
-  sceneCv.width=W; sceneCv.height=H;
-  const c2 = sceneCv.getContext('2d');
-  /* hills */
-  for(const hl of hills){
-    c2.fillStyle=hl.col;
-    c2.beginPath(); c2.moveTo(0,H);
-    hl.pts.forEach(p=>c2.lineTo(p[0],p[1]));
-    c2.lineTo(W,H); c2.closePath(); c2.fill();
+  /* far layer: far hill + far trees + owl + crow perch */
+  farCv = document.createElement('canvas'); farCv.width=W; farCv.height=H;
+  const f2 = farCv.getContext('2d');
+  fillHill(f2,hills[0]);
+  const farTrees=[[0.06,0.095],[0.9,0.11]];
+  for(const [fx,fs] of farTrees){
+    branch(f2, W*fx, hillY(hills[0].pts,W*fx)+minD*0.004, minD*fs, -Math.PI/2, Math.max(3,minD*0.008), 7);
   }
-  /* bare trees */
-  const spots=[[0.06,hills[0].pts,0.095],[0.9,hills[0].pts,0.11],[0.78,hills[1].pts,0.075]];
-  for(const [fx,pts,fs] of spots){
-    branch(c2, W*fx, hillY(pts,W*fx)+minD*0.004, minD*fs, -Math.PI/2, Math.max(3,minD*0.008), 7);
-  }
-  /* neighborhood along the middle hill — homes are the heart of it */
+  owlPos={x:W*0.06, y:hillY(hills[0].pts,W*0.06)+minD*0.004-minD*0.095, s:minD*0.016};
+  crowPos={x:W*0.9,  y:hillY(hills[0].pts,W*0.9)+minD*0.004-minD*0.11,  s:minD*0.013};
+
+  /* near layer: middle+front hills, houses, near tree, pumpkins, hay, scarecrow */
+  nearCv = document.createElement('canvas'); nearCv.width=W; nearCv.height=H;
+  const c2 = nearCv.getContext('2d');
+  fillHill(c2,hills[1]); fillHill(c2,hills[2]);
+  branch(c2, W*0.78, hillY(hills[1].pts,W*0.78)+minD*0.004, minD*0.075, -Math.PI/2, Math.max(3,minD*0.007), 7);
   const hs=minD*0.052;
   const homesX=[0.14,0.26,0.40,0.56,0.70,0.86];
   homesX.forEach((fx,i)=>{
     const x=W*fx, y=hillY(hills[1].pts, x)+minD*0.012;
     house(c2, x, y, hs*(0.86+0.3*((i*2.7)%1)), i%2);
   });
-  /* mini KW yard signs in three front yards (drawn each frame so they can glow) */
-  yardSign(signs, W*0.205, hillY(hills[1].pts,W*0.205)+minD*0.016, hs*0.52);
-  yardSign(signs, W*0.475, hillY(hills[1].pts,W*0.475)+minD*0.016, hs*0.52);
-  yardSign(signs, W*0.79,  hillY(hills[1].pts,W*0.79)+minD*0.016,  hs*0.52);
+  signs.push({x:W*0.205, y:hillY(hills[1].pts,W*0.205)+minD*0.016, s:hs*0.52});
+  signs.push({x:W*0.475, y:hillY(hills[1].pts,W*0.475)+minD*0.016, s:hs*0.52});
+  signs.push({x:W*0.79,  y:hillY(hills[1].pts,W*0.79)+minD*0.016,  s:hs*0.52});
+  /* harvest set dressing */
+  hayBale(c2, W*0.335, hillY(hills[1].pts,W*0.335)+minD*0.012, hs*0.46);
+  hayBale(c2, W*0.63,  hillY(hills[1].pts,W*0.63)+minD*0.010,  hs*0.4);
+  pumpkin(c2, W*0.045, H*0.985, hs*0.5, '#c25a1d');
+  pumpkin(c2, W*0.085, H*0.99,  hs*0.36,'#d9742a');
+  pumpkin(c2, W*0.065, H*0.955, hs*0.3, '#b9481a');
+  pumpkin(c2, W*0.945, H*0.985, hs*0.46,'#d9742a');
+  pumpkin(c2, W*0.975, H*0.965, hs*0.3, '#c25a1d');
+  pumpkin(c2, W*0.50,  hillY(hills[2].pts,W*0.50)+minD*0.004, hs*0.3, '#c25a1d');
+  scarecrowBody(c2, W*0.332, hillY(hills[1].pts,W*0.332)+minD*0.004, hs*0.62);
+  window.__scarecrow={x:W*0.332, y:hillY(hills[1].pts,W*0.332)+minD*0.004, s:hs*0.62};
 }
 function drawWindows(t){
   for(const wd of windows){
@@ -171,7 +218,6 @@ function drawYardSigns(t){
     cx.font='900 '+(s*0.62)+'px Arial, sans-serif';
     cx.textAlign='center'; cx.textBaseline='middle';
     cx.fillText('kw', 0, -s*1.5-phh/2+s*0.03);
-    /* soft glow so they read from the back of the room */
     const a=0.10+0.06*Math.sin(t*1.4+sg.x);
     const rg=cx.createRadialGradient(0,-s*1.9,0, 0,-s*1.9, s*3);
     rg.addColorStop(0,'rgba(255,120,110,'+a.toFixed(3)+')');
@@ -179,6 +225,43 @@ function drawYardSigns(t){
     cx.fillStyle=rg; cx.fillRect(-s*3,-s*5,s*6,s*6);
     cx.restore();
   }
+}
+function drawScarf(t){
+  const sc=window.__scarecrow; if(!sc) return;
+  const s=sc.s, nx=sc.x, ny=sc.y-s*1.46;
+  cx.strokeStyle=KW; cx.lineWidth=Math.max(2,s*0.16); cx.lineCap='round';
+  for(const dir of [1,-1]){
+    const w1=Math.sin(t*2.2+dir)*s*0.16, w2=Math.sin(t*2.2+dir*2.5)*s*0.26;
+    cx.beginPath();
+    cx.moveTo(nx,ny);
+    cx.quadraticCurveTo(nx+dir*s*0.5, ny+s*0.18+w1, nx+dir*s*0.95, ny+s*0.1+w2);
+    cx.stroke();
+  }
+}
+function drawOwl(t){
+  if(!owlPos) return;
+  const {x,y,s}=owlPos;
+  cx.fillStyle='#1a0b10';
+  cx.beginPath(); cx.ellipse(x,y,s*0.75,s,0,0,7); cx.fill();
+  cx.beginPath(); cx.moveTo(x-s*0.6,y-s*0.75); cx.lineTo(x-s*0.35,y-s*1.25); cx.lineTo(x-s*0.1,y-s*0.85); cx.closePath(); cx.fill();
+  cx.beginPath(); cx.moveTo(x+s*0.6,y-s*0.75); cx.lineTo(x+s*0.35,y-s*1.25); cx.lineTo(x+s*0.1,y-s*0.85); cx.closePath(); cx.fill();
+  const blink=(t%7)<0.16 ? 0.12 : 1;
+  cx.fillStyle='rgba(255,183,77,0.95)';
+  cx.beginPath(); cx.ellipse(x-s*0.28,y-s*0.35,s*0.14,s*0.14*blink,0,0,7); cx.fill();
+  cx.beginPath(); cx.ellipse(x+s*0.28,y-s*0.35,s*0.14,s*0.14*blink,0,0,7); cx.fill();
+}
+function drawCrow(t){
+  if(!crowPos) return;
+  const {x,y,s}=crowPos;
+  const tilt=Math.sin(t*0.6)>0.92 ? Math.sin(t*9)*0.12 : 0;   /* occasional head-bob flurry */
+  cx.save();
+  cx.translate(x,y); cx.rotate(tilt);
+  cx.fillStyle='#120609';
+  cx.beginPath(); cx.ellipse(0,0,s*1.05,s*0.7,0.15,0,7); cx.fill();
+  cx.beginPath(); cx.arc(s*0.8,-s*0.55,s*0.42,0,7); cx.fill();
+  cx.beginPath(); cx.moveTo(s*1.14,-s*0.6); cx.lineTo(s*1.6,-s*0.48); cx.lineTo(s*1.1,-s*0.36); cx.closePath(); cx.fill();
+  cx.beginPath(); cx.moveTo(-s*0.9,0); cx.lineTo(-s*1.7,-s*0.25); cx.lineTo(-s*0.8,-s*0.3); cx.closePath(); cx.fill();
+  cx.restore();
 }
 
 /* ---------------- chimney smoke ---------------- */
@@ -277,21 +360,21 @@ function drawEmbers(t,dt){
   }
 }
 
-/* ---------------- KW hot-air balloon, drifting high ---------------- */
-const BALLOON_PERIOD=170, BALLOON_FIRST=18, BALLOON_DUR=70;
-function balloonPhase(t){
-  if(t<BALLOON_FIRST) return null;
-  const tt=t-BALLOON_FIRST, cyc=Math.floor(tt/BALLOON_PERIOD), p=tt-cyc*BALLOON_PERIOD;
-  if(p>BALLOON_DUR) return null;
-  return {p:p/BALLOON_DUR, dir:(cyc%2===0)?1:-1, t};
+/* ---------------- cameo scheduler ---------------- */
+function phase(t, first, period, dur){
+  if(t<first) return null;
+  const tt=t-first, cyc=Math.floor(tt/period), p=tt-cyc*period;
+  if(p>dur) return null;
+  return {p:p/dur, cyc, dir:(cyc%2===0)?1:-1, t};
 }
+
+/* ---------------- KW hot-air balloon ---------------- */
 function drawBalloon(ph){
   const s=minD*0.055;
   const x=ph.dir===1 ? lerp(-s*3, W+s*3, ph.p) : lerp(W+s*3, -s*3, ph.p);
   const y=H*0.16 + Math.sin(ph.t*0.5)*minD*0.015;
   cx.save();
   cx.translate(x,y);
-  /* envelope with KW red + cream gores */
   const cols=[KW,'#f3e2c8',KW,'#f3e2c8',KW];
   cols.forEach((col,i)=>{
     const off=(i-2)*s*0.34;
@@ -304,7 +387,6 @@ function drawBalloon(ph){
   cx.font='900 '+(s*0.55)+'px Arial, sans-serif';
   cx.textAlign='center'; cx.textBaseline='middle';
   cx.fillText('kw', 0, -s*0.12);
-  /* lines + basket */
   cx.strokeStyle='rgba(40,16,10,0.9)'; cx.lineWidth=Math.max(1,s*0.03);
   cx.beginPath(); cx.moveTo(-s*0.4,s*0.9); cx.lineTo(-s*0.18,s*1.5); cx.stroke();
   cx.beginPath(); cx.moveTo( s*0.4,s*0.9); cx.lineTo( s*0.18,s*1.5); cx.stroke();
@@ -313,20 +395,151 @@ function drawBalloon(ph){
   cx.restore();
 }
 
-/* ---------------- turkey parade: big turkey with kw sign + two chicks ---------------- */
-const TURKEY_PERIOD=95, TURKEY_FIRST=6, TURKEY_DUR=28;
-function turkeyPhase(t){
-  if(t<TURKEY_FIRST) return null;
-  const tt=t-TURKEY_FIRST, cyc=Math.floor(tt/TURKEY_PERIOD), p=tt-cyc*TURKEY_PERIOD;
-  if(p>TURKEY_DUR) return null;
-  return {p:p/TURKEY_DUR, dir:(cyc%2===0)?1:-1, t};
+/* ---------------- geese flock (V formation) ---------------- */
+function drawGeese(ph){
+  const s=minD*0.012;
+  const lead={x: ph.dir===1 ? lerp(-s*14, W+s*14, ph.p) : lerp(W+s*14, -s*14, ph.p),
+              y: H*0.14 + Math.sin(ph.t*0.6)*minD*0.012};
+  cx.fillStyle='#160a10';
+  for(let i=0;i<7;i++){
+    const row=Math.ceil(i/2), side=(i%2===0)?1:-1;
+    const bx=lead.x - ph.dir*row*s*3.4;
+    const by=lead.y + (i===0?0:side*row*s*2.2);
+    const flap=Math.sin(ph.t*7+i)* s*1.2;
+    cx.beginPath();
+    cx.ellipse(bx,by,s*1.1,s*0.42,0,0,7); cx.fill();
+    cx.beginPath();
+    cx.moveTo(bx,by); cx.quadraticCurveTo(bx-ph.dir*s*0.4, by-s*1.6-flap, bx-ph.dir*s*2.0, by-s*0.8-flap);
+    cx.quadraticCurveTo(bx-ph.dir*s*0.7, by-s*0.3, bx,by); cx.fill();
+    cx.beginPath(); cx.arc(bx+ph.dir*s*1.2, by-s*0.2, s*0.32,0,7); cx.fill();
+  }
 }
-function turkeyBody(s, t, withSign){
-  const step=Math.sin(t*9);
-  cx.rotate(Math.sin(t*9)*0.03);
+
+/* ---------------- deer pair on the far hill ---------------- */
+function deerX(p){
+  /* walks right→left with two grazing pauses */
+  const stops=[[0.22,0.34],[0.55,0.70]];
+  let move=p;
+  for(const [a,b] of stops){ if(p>a&&p<b) move=a; else if(p>=b) move=p-(b-a); }
+  const span=1-stops.reduce((s,[a,b])=>s+(b-a),0);
+  return 1 - ease(Math.min(1,move/span));
+}
+function grazing(p){
+  for(const [a,b] of [[0.22,0.34],[0.55,0.70]]) if(p>a&&p<b) return Math.min(1,Math.min(p-a,b-p)*18);
+  return 0;
+}
+function deer(x,y,s,t,graze,flip){
+  cx.save();
+  cx.translate(x,y);
+  if(flip) cx.scale(-1,1);
+  cx.fillStyle='#140609'; cx.strokeStyle='#140609';
+  cx.beginPath(); cx.ellipse(0,-s*0.9,s*0.95,s*0.5,0,0,7); cx.fill();
+  cx.lineWidth=Math.max(2,s*0.12); cx.lineCap='round';
+  const step=graze>0?0:Math.sin(t*5)*s*0.18;
+  for(const [lx,o] of [[-s*0.6,step],[-s*0.35,-step],[s*0.4,step],[s*0.65,-step]]){
+    cx.beginPath(); cx.moveTo(lx,-s*0.75); cx.lineTo(lx+o,0); cx.stroke();
+  }
+  const dip=graze* s*0.9;
+  cx.beginPath(); cx.moveTo(-s*0.85,-s*1.05); cx.lineTo(-s*1.3,-s*1.75+dip); cx.stroke();
+  cx.beginPath(); cx.ellipse(-s*1.42,-s*1.82+dip,s*0.3,s*0.2,-0.3,0,7); cx.fill();
+  cx.lineWidth=Math.max(1,s*0.06);
+  cx.beginPath(); cx.moveTo(-s*1.38,-s*2.0+dip); cx.lineTo(-s*1.6,-s*2.5+dip); cx.stroke();
+  cx.beginPath(); cx.moveTo(-s*1.3,-s*2.0+dip); cx.lineTo(-s*1.25,-s*2.55+dip); cx.stroke();
+  cx.beginPath(); cx.moveTo(s*0.9,-s*1.05); cx.lineTo(s*1.15,-s*0.8); cx.stroke();
+  cx.restore();
+}
+function drawDeer(ph){
+  const s=minD*0.03;
+  const fx=deerX(ph.p), g=grazing(ph.p);
+  const x=lerp(W*0.04, W*0.96, fx);
+  deer(x, hillY(hills[0].pts,x)+minD*0.004, s, ph.t, g, false);
+  const x2=x+s*3.4;
+  deer(x2, hillY(hills[0].pts,x2)+minD*0.004, s*0.62, ph.t+0.4, g, false);
+}
+
+/* ---------------- KW farm truck with pumpkins ---------------- */
+function drawTruck(ph){
+  const s=minD*0.05;
+  const x=ph.dir===1 ? lerp(-s*4, W+s*4, ph.p) : lerp(W+s*4, -s*4, ph.p);
+  const y=hillY(hills[0].pts,Math.max(0,Math.min(W,x)))+minD*0.002;
+  const bump=Math.sin(ph.t*11)*s*0.03;
+  cx.save();
+  cx.translate(x,y+bump);
+  if(ph.dir===-1) cx.scale(-1,1);
+  /* headlight glow */
+  const hg=cx.createRadialGradient(s*1.6,-s*0.45,0, s*1.6,-s*0.45, s*2.4);
+  hg.addColorStop(0,'rgba(255,214,140,0.28)'); hg.addColorStop(1,'rgba(255,214,140,0)');
+  cx.fillStyle=hg; cx.fillRect(s*0.8,-s*1.6,s*3.4,s*2.4);
+  /* bed + pumpkins */
+  cx.fillStyle='#8c1a14';
+  cx.fillRect(-s*1.7,-s*0.95,s*1.7,s*0.6);
+  pumpkin(cx,-s*1.3,-s*0.95,s*0.3,'#d9742a');
+  pumpkin(cx,-s*0.85,-s*0.98,s*0.34,'#c25a1d');
+  pumpkin(cx,-s*0.45,-s*0.93,s*0.26,'#d9742a');
+  /* cab */
+  cx.fillStyle=KW;
+  cx.fillRect(-s*0.1,-s*1.0,s*1.8,s*0.65);
+  cx.beginPath();
+  cx.moveTo(s*0.1,-s*1.0); cx.lineTo(s*0.35,-s*1.5); cx.lineTo(s*1.2,-s*1.5); cx.lineTo(s*1.4,-s*1.0);
+  cx.closePath(); cx.fill();
+  cx.fillStyle='#2a0f14';
+  cx.beginPath();
+  cx.moveTo(s*0.42,-s*1.42); cx.lineTo(s*1.12,-s*1.42); cx.lineTo(s*1.27,-s*1.05); cx.lineTo(s*0.46,-s*1.05);
+  cx.closePath(); cx.fill();
+  cx.fillStyle='#fff';
+  cx.font='900 '+(s*0.34)+'px Arial, sans-serif';
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('kw', s*0.78,-s*0.68);
+  /* wheels */
+  for(const wx of [-s*1.15, s*1.15]){
+    cx.fillStyle='#160a0d';
+    cx.beginPath(); cx.arc(wx,-s*0.3,s*0.36,0,7); cx.fill();
+    cx.fillStyle='#8a7f72';
+    cx.beginPath(); cx.arc(wx,-s*0.3,s*0.15,0,7); cx.fill();
+  }
+  /* taillight */
+  cx.fillStyle='rgba(255,80,60,0.9)';
+  cx.fillRect(-s*1.74,-s*0.9,s*0.08,s*0.16);
+  cx.restore();
+}
+
+/* ---------------- squirrel dash ---------------- */
+function drawSquirrel(ph){
+  const s=minD*0.02;
+  const x=ph.dir===1 ? lerp(-s*4, W+s*4, ph.p) : lerp(W+s*4, -s*4, ph.p);
+  const hop=Math.abs(Math.sin(ph.p*Math.PI*14))*s*1.4;
+  const y=H*0.985 - s*0.8 - hop;
+  cx.save();
+  cx.translate(x,y);
+  if(ph.dir===-1) cx.scale(-1,1);
+  cx.fillStyle='#3a1c10';
+  cx.beginPath(); cx.ellipse(0,0,s*1.0,s*0.68,0,0,7); cx.fill();
+  cx.beginPath(); cx.arc(s*0.95,-s*0.3,s*0.42,0,7); cx.fill();
+  cx.beginPath(); cx.moveTo(s*0.8,-s*0.68); cx.lineTo(s*0.95,-s*1.0); cx.lineTo(s*1.1,-s*0.66); cx.closePath(); cx.fill();
+  /* bushy tail */
+  cx.beginPath();
+  cx.moveTo(-s*0.8,0);
+  cx.quadraticCurveTo(-s*2.1,-s*0.3, -s*1.7,-s*1.5);
+  cx.quadraticCurveTo(-s*1.4,-s*2.2, -s*0.75,-s*1.7);
+  cx.quadraticCurveTo(-s*1.1,-s*0.9, -s*0.5,-s*0.4);
+  cx.closePath(); cx.fill();
+  /* acorn */
+  cx.fillStyle='#b9792f';
+  cx.beginPath(); cx.ellipse(s*1.35,-s*0.1,s*0.2,s*0.26,0.3,0,7); cx.fill();
+  cx.fillStyle='#4a2a12';
+  cx.beginPath(); cx.ellipse(s*1.3,-s*0.32,s*0.22,s*0.12,0.3,0,7); cx.fill();
+  /* eye */
+  cx.fillStyle='#fff'; cx.beginPath(); cx.arc(s*1.02,-s*0.38,s*0.09,0,7); cx.fill();
+  cx.restore();
+}
+
+/* ---------------- turkeys: parade on even passes, tail-fan show on odd ---------------- */
+function turkeyBody(s, t, withSign, spread, still){
+  const step=still?0:Math.sin(t*9);
+  cx.rotate(step*0.03);
   const FE=['#8a3d1c','#d9742a','#B40111','#e0a62c','#B40111','#d9742a','#8a3d1c'];
   FE.forEach((col,i)=>{
-    const a=Math.PI*(0.86 - i*0.12) + Math.sin(t*2+i)*0.02;
+    const a=Math.PI*(0.5+(0.36-i*0.12)*spread) + Math.sin(t*2+i)*0.02;
     cx.save();
     cx.translate(-s*0.35,0); cx.rotate(a-Math.PI/2);
     cx.fillStyle=col;
@@ -352,7 +565,7 @@ function turkeyBody(s, t, withSign){
   cx.beginPath(); cx.ellipse(s*0.95,-s*0.62,s*0.05,s*0.11,0.2,0,7); cx.fill();
   if(withSign){
     cx.save();
-    cx.rotate(-0.08+Math.sin(t*9)*0.02);
+    cx.rotate(-0.08+step*0.02);
     cx.strokeStyle='#d8d3cc'; cx.lineWidth=Math.max(2,s*0.05);
     cx.beginPath(); cx.moveTo(s*0.30,-s*0.25); cx.lineTo(s*0.62,-s*1.45); cx.stroke();
     const pw=s*0.78, phh=s*0.5, px=s*0.62-pw/2, py=-s*1.95;
@@ -370,33 +583,51 @@ function turkeyBody(s, t, withSign){
 function drawTurkeys(ph){
   const s=minD*0.105;
   const yb=H*0.965 - s*0.9;
-  const headX=ph.dir===1 ? lerp(-s*2.5, W+s*5.5, ph.p) : lerp(W+s*2.5, -s*5.5, ph.p);
-  /* big turkey */
-  cx.save();
-  cx.translate(headX, yb-Math.abs(Math.sin(ph.t*9))*s*0.06);
-  if(ph.dir===-1) cx.scale(-1,1);
-  turkeyBody(s, ph.t, true);
-  cx.restore();
-  /* two chicks trailing behind */
-  for(let i=1;i<=2;i++){
-    const cs=s*(0.42-0.06*i);
-    const gap=s*(1.9+1.5*i);
-    const xx=headX - ph.dir*gap;
-    const tt=ph.t - i*0.22;
+  const solo = ph.cyc%2===1;
+  if(!solo){
+    const headX=ph.dir===1 ? lerp(-s*2.5, W+s*5.5, ph.p) : lerp(W+s*2.5, -s*5.5, ph.p);
     cx.save();
-    cx.translate(xx, H*0.965 - cs*0.9 - Math.abs(Math.sin(tt*9))*cs*0.1);
+    cx.translate(headX, yb-Math.abs(Math.sin(ph.t*9))*s*0.06);
     if(ph.dir===-1) cx.scale(-1,1);
-    turkeyBody(cs, tt, false);
+    turkeyBody(s, ph.t, true, 1, false);
+    cx.restore();
+    for(let i=1;i<=2;i++){
+      const cs=s*(0.42-0.06*i);
+      const gap=s*(1.9+1.5*i);
+      const xx=headX - ph.dir*gap;
+      const tt=ph.t - i*0.22;
+      cx.save();
+      cx.translate(xx, H*0.965 - cs*0.9 - Math.abs(Math.sin(tt*9))*cs*0.1);
+      if(ph.dir===-1) cx.scale(-1,1);
+      turkeyBody(cs, tt, false, 1, false);
+      cx.restore();
+    }
+  } else {
+    /* solo: walk to center, stop, fan the tail wide, little shimmy, walk off */
+    let xp, still=false, spread=1;
+    if(ph.p<0.38){ xp=lerp(0,0.5,ease(ph.p/0.38)); }
+    else if(ph.p<0.62){
+      xp=0.5; still=true;
+      const q=(ph.p-0.38)/0.24;
+      spread=1+0.3*Math.sin(Math.min(1,q*1.4)*Math.PI);
+    }
+    else { xp=lerp(0.5,1,ease((ph.p-0.62)/0.38)); }
+    const x=ph.dir===1 ? lerp(-s*2.5, W+s*2.5, xp) : lerp(W+s*2.5, -s*2.5, xp);
+    const shimmy=still?Math.sin(ph.t*13)*s*0.015:0;
+    cx.save();
+    cx.translate(x+shimmy, yb-(still?0:Math.abs(Math.sin(ph.t*9))*s*0.06));
+    if(ph.dir===-1) cx.scale(-1,1);
+    turkeyBody(s*1.08, ph.t, true, spread, still);
     cx.restore();
   }
 }
 
 /* ---------------- titles ---------------- */
-/* rotating lines; the KW mission line renders smaller */
 const LINES=[
   {txt:'Happy Thanksgiving', f:0.085},
   {txt:'Grateful for you', f:0.082},
   {txt:'Thankful for home', f:0.082},
+  {txt:'From our family to yours', f:0.068},
   {txt:'Careers worth having · Businesses worth owning · Lives worth living', f:0.034},
 ];
 const LINE_SECS=16;
@@ -450,15 +681,20 @@ function frame(ts){
   const dt=Math.min(0.1,(ts-last)/1000); last=ts;
   const t=ts/1000;
   drawSky(t);
-  const bp=balloonPhase(t);
-  if(bp) drawBalloon(bp);
-  if(sceneCv) cx.drawImage(sceneCv,0,0);
+  const bp=phase(t,18,170,70);  if(bp) drawBalloon(bp);
+  const gp=phase(t,30,85,22);   if(gp) drawGeese(gp);
+  if(farCv) cx.drawImage(farCv,0,0);
+  drawOwl(t); drawCrow(t);
+  const dp=phase(t,55,150,45);  if(dp) drawDeer(dp);
+  const kp=phase(t,110,210,26); if(kp) drawTruck(kp);
+  if(nearCv) cx.drawImage(nearCv,0,0);
   drawWindows(t);
   drawYardSigns(t);
+  drawScarf(t);
   drawSmoke(t,dt);
   drawEmbers(t,dt);
-  const ph=turkeyPhase(t);
-  if(ph) drawTurkeys(ph);
+  const tp=phase(t,6,95,28);    if(tp) drawTurkeys(tp);
+  const sp=phase(t,45,70,9);    if(sp) drawSquirrel(sp);
   drawLeaves(t,dt);
   drawTitle(t);
   drawMark();
