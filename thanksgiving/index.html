@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>KW Citywide Thanksgiving</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23B40111'/><text x='50' y='68' font-size='52' font-weight='900' font-family='Arial' fill='white' text-anchor='middle'>kw</text></svg>">
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#1d0b18;overflow:hidden}
+  canvas{display:block;width:100vw;height:100vh}
+  body.idle{cursor:none}
+  #hint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);color:#fff;opacity:.45;
+    font:500 13px/1.4 system-ui,Segoe UI,Arial,sans-serif;letter-spacing:.06em;
+    background:rgba(0,0,0,.35);padding:6px 14px;border-radius:999px;transition:opacity .6s}
+  body.idle #hint{opacity:0}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hint">Press F or click for fullscreen</div>
+<script>
+(function(){
+'use strict';
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+const KW = '#B40111';
+
+let W=0, H=0, minD=0, DPR=1;
+let hills=null, sceneCv=null, windows=[], chimneys=[], signs=[];
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio||1, 1.5);
+  W = Math.max(2, Math.round(innerWidth*DPR));
+  H = Math.max(2, Math.round(innerHeight*DPR));
+  cv.width=W; cv.height=H; minD=Math.min(W,H);
+  buildHills(); buildScene(); buildLeafSprites();
+}
+addEventListener('resize', resize);
+
+function lerp(a,b,t){ return a+(b-a)*t; }
+function mix(c1,c2,t){ return [lerp(c1[0],c2[0],t),lerp(c1[1],c2[1],t),lerp(c1[2],c2[2],t)]; }
+function rgb(c){ return 'rgb('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+')'; }
+
+/* ---------------- sky + stars ---------------- */
+const SKY_A = { top:[34,13,40], mid:[106,30,34], low:[214,126,52] };
+const SKY_B = { top:[24,10,46], mid:[128,24,30], low:[228,150,58] };
+const stars=[];
+function seedStars(){
+  for(let i=0;i<42;i++) stars.push({x:Math.random(), y:Math.random()*0.34, ph:Math.random()*7, s:0.7+Math.random()*1.4});
+}
+function drawSky(t){
+  const k = 0.5+0.5*Math.sin(t*2*Math.PI/75);
+  const g = cx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,    rgb(mix(SKY_A.top, SKY_B.top, k)));
+  g.addColorStop(0.55, rgb(mix(SKY_A.mid, SKY_B.mid, k)));
+  g.addColorStop(1,    rgb(mix(SKY_A.low, SKY_B.low, k)));
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  for(const st of stars){
+    const a=0.18+0.4*(0.5+0.5*Math.sin(t*1.3+st.ph));
+    cx.fillStyle='rgba(255,240,215,'+a.toFixed(3)+')';
+    cx.beginPath(); cx.arc(st.x*W, st.y*H, st.s*DPR, 0, 7); cx.fill();
+  }
+  const sx=W*0.5, sy=H*0.74, r=minD*(0.52+0.03*Math.sin(t*2*Math.PI/14));
+  const rg = cx.createRadialGradient(sx,sy,0,sx,sy,r);
+  rg.addColorStop(0,'rgba(255,208,130,0.34)');
+  rg.addColorStop(0.5,'rgba(255,170,90,0.14)');
+  rg.addColorStop(1,'rgba(255,170,90,0)');
+  cx.fillStyle=rg; cx.fillRect(0,0,W,H);
+}
+
+/* ---------------- hills ---------------- */
+function hillPath(yBase, amp, seed){
+  const pts=[];
+  for(let i=0;i<=24;i++){
+    const x=W*i/24;
+    const y=yBase + amp*Math.sin(seed+i*0.9) + amp*0.6*Math.sin(seed*2+i*0.37);
+    pts.push([x,y]);
+  }
+  return pts;
+}
+function hillY(pts,x){
+  const seg=W/24, i=Math.max(0,Math.min(23, Math.floor(x/seg)));
+  const t=(x-i*seg)/seg;
+  return lerp(pts[i][1], pts[i+1][1], t);
+}
+function buildHills(){
+  hills = [
+    {pts:hillPath(H*0.74, minD*0.016, 1.7), col:'#4a1d22'},
+    {pts:hillPath(H*0.82, minD*0.022, 4.2), col:'#38151c'},
+    {pts:hillPath(H*0.90, minD*0.020, 7.9), col:'#260d14'},
+  ];
+}
+
+/* ---------------- static scene: hills + trees + neighborhood (offscreen) ---------------- */
+function branch(c2,x,y,len,ang,w,depth){
+  if(depth===0 || len<2) return;
+  const x2=x+Math.cos(ang)*len, y2=y+Math.sin(ang)*len;
+  c2.strokeStyle='#1c0a10'; c2.lineWidth=w; c2.lineCap='round';
+  c2.beginPath(); c2.moveTo(x,y); c2.lineTo(x2,y2); c2.stroke();
+  branch(c2,x2,y2,len*0.72,ang-0.45+Math.sin(depth*2.3)*0.12,w*0.65,depth-1);
+  branch(c2,x2,y2,len*0.70,ang+0.42+Math.cos(depth*1.7)*0.12,w*0.65,depth-1);
+}
+function house(c2,x,y,s,roof){
+  /* silhouette house, base anchored at (x,y); registers windows/chimney/possible sign */
+  const w=s*1.5, h=s;
+  c2.fillStyle='#180a0e';
+  c2.fillRect(x-w/2, y-h, w, h);
+  c2.beginPath();
+  if(roof===0){ c2.moveTo(x-w/2-s*0.14, y-h); c2.lineTo(x, y-h-s*0.72); c2.lineTo(x+w/2+s*0.14, y-h); }
+  else { c2.moveTo(x-w/2-s*0.12, y-h); c2.lineTo(x-w*0.1, y-h-s*0.6); c2.lineTo(x+w/2+s*0.12, y-h-s*0.18); }
+  c2.closePath(); c2.fill();
+  /* chimney */
+  const chx=x+w*0.26, chTop=y-h-s*0.78;
+  c2.fillRect(chx-s*0.09, chTop, s*0.18, s*0.5);
+  chimneys.push({x:chx, y:chTop});
+  /* windows (lit later, every frame) */
+  const rows=[[x-w*0.3,y-h*0.62],[x+w*0.08,y-h*0.62],[x-w*0.3,y-h*0.24],[x+w*0.08,y-h*0.24]];
+  for(let i=0;i<rows.length;i++){
+    if(Math.random()<0.78) windows.push({x:rows[i][0], y:rows[i][1], w:s*0.22, h:s*0.26, ph:Math.random()*7});
+  }
+}
+function yardSign(list,x,y,s){ list.push({x,y,s}); }
+function buildScene(){
+  windows=[]; chimneys=[]; signs=[];
+  sceneCv = document.createElement('canvas');
+  sceneCv.width=W; sceneCv.height=H;
+  const c2 = sceneCv.getContext('2d');
+  /* hills */
+  for(const hl of hills){
+    c2.fillStyle=hl.col;
+    c2.beginPath(); c2.moveTo(0,H);
+    hl.pts.forEach(p=>c2.lineTo(p[0],p[1]));
+    c2.lineTo(W,H); c2.closePath(); c2.fill();
+  }
+  /* bare trees */
+  const spots=[[0.06,hills[0].pts,0.095],[0.9,hills[0].pts,0.11],[0.78,hills[1].pts,0.075]];
+  for(const [fx,pts,fs] of spots){
+    branch(c2, W*fx, hillY(pts,W*fx)+minD*0.004, minD*fs, -Math.PI/2, Math.max(3,minD*0.008), 7);
+  }
+  /* neighborhood along the middle hill — homes are the heart of it */
+  const hs=minD*0.052;
+  const homesX=[0.14,0.26,0.40,0.56,0.70,0.86];
+  homesX.forEach((fx,i)=>{
+    const x=W*fx, y=hillY(hills[1].pts, x)+minD*0.012;
+    house(c2, x, y, hs*(0.86+0.3*((i*2.7)%1)), i%2);
+  });
+  /* mini KW yard signs in three front yards (drawn each frame so they can glow) */
+  yardSign(signs, W*0.205, hillY(hills[1].pts,W*0.205)+minD*0.016, hs*0.52);
+  yardSign(signs, W*0.475, hillY(hills[1].pts,W*0.475)+minD*0.016, hs*0.52);
+  yardSign(signs, W*0.79,  hillY(hills[1].pts,W*0.79)+minD*0.016,  hs*0.52);
+}
+function drawWindows(t){
+  for(const wd of windows){
+    const a=0.55+0.3*(0.5+0.5*Math.sin(t*1.1+wd.ph));
+    cx.fillStyle='rgba(255,193,100,'+a.toFixed(3)+')';
+    cx.fillRect(wd.x, wd.y, wd.w, wd.h);
+  }
+}
+function drawYardSigns(t){
+  for(const sg of signs){
+    const s=sg.s;
+    cx.save();
+    cx.translate(sg.x, sg.y);
+    cx.strokeStyle='#cfc8bf'; cx.lineWidth=Math.max(1.5,s*0.09);
+    cx.beginPath(); cx.moveTo(0,0); cx.lineTo(0,-s*1.5); cx.stroke();
+    const pw=s*1.5, phh=s*0.9;
+    cx.fillStyle='#fff'; cx.fillRect(-pw/2-s*0.05, -s*1.5-phh-s*0.05, pw+s*0.1, phh+s*0.1);
+    cx.fillStyle=KW;    cx.fillRect(-pw/2, -s*1.5-phh, pw, phh);
+    cx.fillStyle='#fff';
+    cx.font='900 '+(s*0.62)+'px Arial, sans-serif';
+    cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText('kw', 0, -s*1.5-phh/2+s*0.03);
+    /* soft glow so they read from the back of the room */
+    const a=0.10+0.06*Math.sin(t*1.4+sg.x);
+    const rg=cx.createRadialGradient(0,-s*1.9,0, 0,-s*1.9, s*3);
+    rg.addColorStop(0,'rgba(255,120,110,'+a.toFixed(3)+')');
+    rg.addColorStop(1,'rgba(255,120,110,0)');
+    cx.fillStyle=rg; cx.fillRect(-s*3,-s*5,s*6,s*6);
+    cx.restore();
+  }
+}
+
+/* ---------------- chimney smoke ---------------- */
+const puffs=[];
+function drawSmoke(t,dt){
+  if(chimneys.length && Math.random()<dt*2.2){
+    const ch=chimneys[(Math.random()*chimneys.length)|0];
+    puffs.push({x:ch.x, y:ch.y, a:0.22, r:minD*0.004, vx:(Math.random()-0.3)*minD*0.004, ph:Math.random()*7, age:0});
+  }
+  for(let i=puffs.length-1;i>=0;i--){
+    const p=puffs[i];
+    p.age+=dt; p.y-=dt*minD*0.016; p.x+=p.vx*dt*8+Math.sin(t+p.ph)*dt*minD*0.003;
+    p.r+=dt*minD*0.006; p.a-=dt*0.045;
+    if(p.a<=0){ puffs.splice(i,1); continue; }
+    cx.fillStyle='rgba(235,220,210,'+p.a.toFixed(3)+')';
+    cx.beginPath(); cx.arc(p.x,p.y,p.r,0,7); cx.fill();
+  }
+}
+
+/* ---------------- leaves ---------------- */
+const LEAF_COLS=['#c23b1c','#d9742a','#e0a62c','#8a3d1c','#a63b2a', '#B40111'];
+let leafSprites=[];
+function leafShape(c2,s,v){
+  c2.beginPath();
+  if(v===0){
+    c2.moveTo(0,-s); c2.quadraticCurveTo(s*0.9,-s*0.4, s*0.55,0.2*s);
+    c2.quadraticCurveTo(s*0.9,s*0.5, 0,s); c2.quadraticCurveTo(-s*0.9,s*0.5, -s*0.55,0.2*s);
+    c2.quadraticCurveTo(-s*0.9,-s*0.4, 0,-s);
+  } else if(v===1){ c2.ellipse(0,0,s*0.55,s,0,0,7); }
+  else { c2.moveTo(0,-s); c2.quadraticCurveTo(s*0.8,0, 0,s); c2.quadraticCurveTo(-s*0.8,0, 0,-s); }
+  c2.closePath();
+}
+function buildLeafSprites(){
+  leafSprites=[];
+  const s = Math.max(7, minD*0.013);
+  for(const col of LEAF_COLS){
+    for(let v=0;v<3;v++){
+      const sc=document.createElement('canvas');
+      sc.width=sc.height=Math.ceil(s*2.6);
+      const c2=sc.getContext('2d');
+      c2.translate(sc.width/2, sc.height/2);
+      c2.fillStyle=col;
+      leafShape(c2,s,v); c2.fill();
+      c2.strokeStyle='rgba(0,0,0,0.25)'; c2.lineWidth=1;
+      c2.beginPath(); c2.moveTo(0,-s); c2.lineTo(0,s*0.9); c2.stroke();
+      leafSprites.push(sc);
+    }
+  }
+}
+const leaves=[];
+function seedLeaves(){
+  for(let i=0;i<46;i++){
+    leaves.push({
+      x:Math.random(), y:Math.random(),
+      sp:0.018+Math.random()*0.03,
+      sway:0.012+Math.random()*0.03, ph:Math.random()*7,
+      rot:Math.random()*7, rs:(Math.random()-0.5)*2.2,
+      sprite:(Math.random()*18)|0, sc:0.6+Math.random()*0.9,
+      depth:0.45+Math.random()*0.55
+    });
+  }
+}
+function drawLeaves(t,dt){
+  for(const L of leaves){
+    L.y += L.sp*dt*L.depth;
+    L.rot += L.rs*dt;
+    if(L.y>1.06){ L.y=-0.06; L.x=Math.random(); }
+    const x=(L.x + Math.sin(t*0.5+L.ph)*L.sway)*W;
+    const y=L.y*H;
+    const sp=leafSprites[L.sprite%leafSprites.length];
+    cx.save();
+    cx.globalAlpha=0.5+0.5*L.depth;
+    cx.translate(x,y); cx.rotate(L.rot); cx.scale(L.sc*L.depth,L.sc*L.depth);
+    cx.drawImage(sp,-sp.width/2,-sp.height/2);
+    cx.restore();
+  }
+}
+
+/* ---------------- embers ---------------- */
+const embers=[];
+function seedEmbers(){
+  for(let i=0;i<26;i++){
+    embers.push({x:Math.random(), y:Math.random(), sp:0.008+Math.random()*0.016,
+      ph:Math.random()*7, s:1+Math.random()*2.2});
+  }
+}
+function drawEmbers(t,dt){
+  for(const e of embers){
+    e.y -= e.sp*dt;
+    if(e.y<-0.02){ e.y=1.02; e.x=Math.random(); }
+    const a=0.25+0.3*(0.5+0.5*Math.sin(t*2.1+e.ph));
+    cx.fillStyle='rgba(255,196,110,'+a.toFixed(3)+')';
+    cx.beginPath();
+    cx.arc((e.x+0.01*Math.sin(t*0.7+e.ph))*W, e.y*H, e.s*DPR, 0, 7);
+    cx.fill();
+  }
+}
+
+/* ---------------- KW hot-air balloon, drifting high ---------------- */
+const BALLOON_PERIOD=170, BALLOON_FIRST=18, BALLOON_DUR=70;
+function balloonPhase(t){
+  if(t<BALLOON_FIRST) return null;
+  const tt=t-BALLOON_FIRST, cyc=Math.floor(tt/BALLOON_PERIOD), p=tt-cyc*BALLOON_PERIOD;
+  if(p>BALLOON_DUR) return null;
+  return {p:p/BALLOON_DUR, dir:(cyc%2===0)?1:-1, t};
+}
+function drawBalloon(ph){
+  const s=minD*0.055;
+  const x=ph.dir===1 ? lerp(-s*3, W+s*3, ph.p) : lerp(W+s*3, -s*3, ph.p);
+  const y=H*0.16 + Math.sin(ph.t*0.5)*minD*0.015;
+  cx.save();
+  cx.translate(x,y);
+  /* envelope with KW red + cream gores */
+  const cols=[KW,'#f3e2c8',KW,'#f3e2c8',KW];
+  cols.forEach((col,i)=>{
+    const off=(i-2)*s*0.34;
+    cx.fillStyle=col;
+    cx.beginPath();
+    cx.ellipse(off*0.52, 0, s*(0.42-Math.abs(i-2)*0.06), s, 0, 0, 7);
+    cx.fill();
+  });
+  cx.fillStyle='#fff';
+  cx.font='900 '+(s*0.55)+'px Arial, sans-serif';
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('kw', 0, -s*0.12);
+  /* lines + basket */
+  cx.strokeStyle='rgba(40,16,10,0.9)'; cx.lineWidth=Math.max(1,s*0.03);
+  cx.beginPath(); cx.moveTo(-s*0.4,s*0.9); cx.lineTo(-s*0.18,s*1.5); cx.stroke();
+  cx.beginPath(); cx.moveTo( s*0.4,s*0.9); cx.lineTo( s*0.18,s*1.5); cx.stroke();
+  cx.fillStyle='#4a2614';
+  cx.fillRect(-s*0.24, s*1.5, s*0.48, s*0.34);
+  cx.restore();
+}
+
+/* ---------------- turkey parade: big turkey with kw sign + two chicks ---------------- */
+const TURKEY_PERIOD=95, TURKEY_FIRST=6, TURKEY_DUR=28;
+function turkeyPhase(t){
+  if(t<TURKEY_FIRST) return null;
+  const tt=t-TURKEY_FIRST, cyc=Math.floor(tt/TURKEY_PERIOD), p=tt-cyc*TURKEY_PERIOD;
+  if(p>TURKEY_DUR) return null;
+  return {p:p/TURKEY_DUR, dir:(cyc%2===0)?1:-1, t};
+}
+function turkeyBody(s, t, withSign){
+  const step=Math.sin(t*9);
+  cx.rotate(Math.sin(t*9)*0.03);
+  const FE=['#8a3d1c','#d9742a','#B40111','#e0a62c','#B40111','#d9742a','#8a3d1c'];
+  FE.forEach((col,i)=>{
+    const a=Math.PI*(0.86 - i*0.12) + Math.sin(t*2+i)*0.02;
+    cx.save();
+    cx.translate(-s*0.35,0); cx.rotate(a-Math.PI/2);
+    cx.fillStyle=col;
+    cx.beginPath(); cx.ellipse(0,-s*0.95,s*0.22,s*0.95,0,0,7); cx.fill();
+    cx.restore();
+  });
+  cx.fillStyle='#4a2614';
+  cx.beginPath(); cx.ellipse(0,0,s*0.78,s*0.7,0,0,7); cx.fill();
+  cx.fillStyle='#5d3018';
+  cx.beginPath(); cx.ellipse(-s*0.1,s*0.12,s*0.62,s*0.5,0,0,7); cx.fill();
+  cx.strokeStyle='#e8a33c'; cx.lineWidth=Math.max(2,s*0.07); cx.lineCap='round';
+  const l1=step*s*0.22, l2=-step*s*0.22;
+  cx.beginPath(); cx.moveTo(-s*0.12,s*0.55); cx.lineTo(-s*0.12+l1,s*0.95); cx.stroke();
+  cx.beginPath(); cx.moveTo( s*0.18,s*0.55); cx.lineTo( s*0.18+l2,s*0.95); cx.stroke();
+  cx.fillStyle='#4a2614';
+  cx.beginPath(); cx.ellipse(s*0.62,-s*0.52,s*0.2,s*0.34,0.3,0,7); cx.fill();
+  cx.beginPath(); cx.arc(s*0.78,-s*0.78,s*0.2,0,7); cx.fill();
+  cx.fillStyle='#fff'; cx.beginPath(); cx.arc(s*0.84,-s*0.82,s*0.055,0,7); cx.fill();
+  cx.fillStyle='#1a0a06'; cx.beginPath(); cx.arc(s*0.86,-s*0.82,s*0.028,0,7); cx.fill();
+  cx.fillStyle='#e8a33c';
+  cx.beginPath(); cx.moveTo(s*0.96,-s*0.80); cx.lineTo(s*1.12,-s*0.74); cx.lineTo(s*0.95,-s*0.69); cx.closePath(); cx.fill();
+  cx.fillStyle='#c22a1e';
+  cx.beginPath(); cx.ellipse(s*0.95,-s*0.62,s*0.05,s*0.11,0.2,0,7); cx.fill();
+  if(withSign){
+    cx.save();
+    cx.rotate(-0.08+Math.sin(t*9)*0.02);
+    cx.strokeStyle='#d8d3cc'; cx.lineWidth=Math.max(2,s*0.05);
+    cx.beginPath(); cx.moveTo(s*0.30,-s*0.25); cx.lineTo(s*0.62,-s*1.45); cx.stroke();
+    const pw=s*0.78, phh=s*0.5, px=s*0.62-pw/2, py=-s*1.95;
+    cx.fillStyle='#fff';
+    cx.fillRect(px-s*0.03, py-s*0.03, pw+s*0.06, phh+s*0.06);
+    cx.fillStyle=KW;
+    cx.fillRect(px,py,pw,phh);
+    cx.fillStyle='#fff';
+    cx.font='900 '+(s*0.34)+'px Arial, sans-serif';
+    cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText('kw', px+pw/2, py+phh/2+s*0.02);
+    cx.restore();
+  }
+}
+function drawTurkeys(ph){
+  const s=minD*0.105;
+  const yb=H*0.965 - s*0.9;
+  const headX=ph.dir===1 ? lerp(-s*2.5, W+s*5.5, ph.p) : lerp(W+s*2.5, -s*5.5, ph.p);
+  /* big turkey */
+  cx.save();
+  cx.translate(headX, yb-Math.abs(Math.sin(ph.t*9))*s*0.06);
+  if(ph.dir===-1) cx.scale(-1,1);
+  turkeyBody(s, ph.t, true);
+  cx.restore();
+  /* two chicks trailing behind */
+  for(let i=1;i<=2;i++){
+    const cs=s*(0.42-0.06*i);
+    const gap=s*(1.9+1.5*i);
+    const xx=headX - ph.dir*gap;
+    const tt=ph.t - i*0.22;
+    cx.save();
+    cx.translate(xx, H*0.965 - cs*0.9 - Math.abs(Math.sin(tt*9))*cs*0.1);
+    if(ph.dir===-1) cx.scale(-1,1);
+    turkeyBody(cs, tt, false);
+    cx.restore();
+  }
+}
+
+/* ---------------- titles ---------------- */
+/* rotating lines; the KW mission line renders smaller */
+const LINES=[
+  {txt:'Happy Thanksgiving', f:0.085},
+  {txt:'Grateful for you', f:0.082},
+  {txt:'Thankful for home', f:0.082},
+  {txt:'Careers worth having · Businesses worth owning · Lives worth living', f:0.034},
+];
+const LINE_SECS=16;
+function drawTitle(t){
+  const n=LINES.length;
+  const p=(t%(LINE_SECS*n))/LINE_SECS;
+  const idx=Math.floor(p)%n, lp=p-Math.floor(p);
+  const fade=Math.min(1, Math.min(lp,1-lp)*9);
+  const breathe=0.84+0.10*Math.sin(t*2*Math.PI/9);
+  const L=LINES[idx];
+  const y=H*0.30;
+  cx.save();
+  cx.textAlign='center';
+  cx.shadowColor='rgba(0,0,0,0.45)'; cx.shadowBlur=minD*0.02;
+  cx.fillStyle='rgba(255,245,230,'+(breathe*fade).toFixed(3)+')';
+  cx.font='italic 600 '+(minD*L.f)+'px Georgia, "Times New Roman", serif';
+  cx.fillText(L.txt, W/2, y);
+  cx.shadowBlur=0;
+  cx.fillStyle='rgba(255,224,178,0.80)';
+  cx.font='600 '+(minD*0.024)+'px system-ui, "Segoe UI", Arial, sans-serif';
+  cx.fillText('K W   C I T Y W I D E   T H A N K S G I V I N G   ·   2 0 2 6', W/2, y+minD*0.062);
+  cx.restore();
+}
+function drawMark(){
+  const s=minD*0.052, m=minD*0.035;
+  const x=W-m-s, y=H-m-s;
+  cx.save();
+  cx.globalAlpha=0.9;
+  cx.fillStyle=KW;
+  const r=s*0.2;
+  cx.beginPath();
+  cx.moveTo(x+r,y); cx.arcTo(x+s,y,x+s,y+s,r); cx.arcTo(x+s,y+s,x,y+s,r);
+  cx.arcTo(x,y+s,x,y,r); cx.arcTo(x,y,x+s,y,r); cx.closePath(); cx.fill();
+  cx.fillStyle='#fff';
+  cx.font='900 '+(s*0.52)+'px Arial, sans-serif';
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('kw', x+s/2, y+s/2+s*0.03);
+  cx.globalAlpha=0.75;
+  cx.fillStyle='#ffe0b2';
+  cx.font='600 '+(minD*0.016)+'px system-ui, Arial, sans-serif';
+  cx.textAlign='right'; cx.textBaseline='alphabetic';
+  cx.fillText('KELLER WILLIAMS', x-s*0.3, y+s*0.62);
+  cx.restore();
+}
+
+/* ---------------- main loop ---------------- */
+let last=null;
+function frame(ts){
+  requestAnimationFrame(frame);
+  if(last==null) last=ts;
+  const dt=Math.min(0.1,(ts-last)/1000); last=ts;
+  const t=ts/1000;
+  drawSky(t);
+  const bp=balloonPhase(t);
+  if(bp) drawBalloon(bp);
+  if(sceneCv) cx.drawImage(sceneCv,0,0);
+  drawWindows(t);
+  drawYardSigns(t);
+  drawSmoke(t,dt);
+  drawEmbers(t,dt);
+  const ph=turkeyPhase(t);
+  if(ph) drawTurkeys(ph);
+  drawLeaves(t,dt);
+  drawTitle(t);
+  drawMark();
+}
+
+/* ---------------- kiosk niceties ---------------- */
+function goFull(){
+  const el=document.documentElement;
+  if(document.fullscreenElement){ document.exitFullscreen&&document.exitFullscreen(); }
+  else if(el.requestFullscreen){ el.requestFullscreen(); }
+}
+addEventListener('keydown',e=>{ if(e.key==='f'||e.key==='F') goFull(); });
+cv.addEventListener('click', goFull);
+let idleT=null;
+function poke(){
+  document.body.classList.remove('idle');
+  clearTimeout(idleT); idleT=setTimeout(()=>document.body.classList.add('idle'),3500);
+}
+addEventListener('mousemove',poke); poke();
+async function wakeLock(){ try{ await navigator.wakeLock.request('screen'); }catch(e){} }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) wakeLock(); });
+wakeLock();
+
+resize(); seedLeaves(); seedEmbers(); seedStars();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
